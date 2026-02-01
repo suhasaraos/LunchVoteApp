@@ -11,6 +11,11 @@
   background-color: rgba(255, 184, 28, 0.1);
 }
 
+.result-bar-container.highlight {
+  border-color: #0969da;
+  background-color: rgba(9, 105, 218, 0.05);
+}
+
 .result-bar-header {
   display: flex;
   justify-content: space-between;

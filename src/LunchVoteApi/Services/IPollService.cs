@@ -27,4 +27,10 @@ public interface IPollService
     /// <param name="pollId">The poll identifier.</param>
     /// <returns>The poll results, or null if poll not found.</returns>
     Task<PollResultsResponse?> GetPollResultsAsync(Guid pollId);
+    
+    /// <summary>
+    /// Gets all group IDs that have active polls.
+    /// </summary>
+    /// <returns>A list of group IDs with active polls.</returns>
+    Task<List<string>> GetActiveGroupIdsAsync();
 }

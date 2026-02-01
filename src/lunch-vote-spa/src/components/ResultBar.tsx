@@ -1,29 +1,27 @@
-import { OptionResult } from '../types';
 import './ResultBar.css';
 
 interface ResultBarProps {
-  result: OptionResult;
-  totalVotes: number;
+  text: string;
+  count: number;
+  percentage: number;
   isWinner: boolean;
+  highlight?: boolean;
 }
 
 /**
  * A result bar showing vote count and percentage for an option.
  */
-export function ResultBar({ result, totalVotes, isWinner }: ResultBarProps) {
-  const percentage = totalVotes > 0 
-    ? Math.round((result.count / totalVotes) * 100) 
-    : 0;
-
+export function ResultBar({ text, count, percentage, isWinner, highlight = false }: ResultBarProps) {
   return (
-    <div className={`result-bar-container ${isWinner ? 'winner' : ''}`}>
+    <div className={`result-bar-container ${isWinner ? 'winner' : ''} ${highlight ? 'highlight' : ''}`}>
       <div className="result-bar-header">
         <span className="result-bar-text">
-          {result.text}
+          {text}
           {isWinner && <span className="winner-badge">🏆</span>}
+          {highlight && <span style={{ marginLeft: '0.5rem', color: '#0969da' }}>✓</span>}
         </span>
         <span className="result-bar-count">
-          {result.count} {result.count === 1 ? 'vote' : 'votes'} ({percentage}%)
+          {count} {count === 1 ? 'vote' : 'votes'} ({percentage}%)
         </span>
       </div>
       <div className="result-bar-track">

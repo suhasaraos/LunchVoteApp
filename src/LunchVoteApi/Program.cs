@@ -13,13 +13,22 @@ builder.Services.AddSwaggerGen();
 // Configure DbContext - check if already configured externally (e.g., by tests)
 // In testing scenarios, skip SQL Server registration entirely
 var isTestEnvironment = builder.Environment.EnvironmentName == "Testing";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var useInMemoryDatabase = string.IsNullOrEmpty(connectionString);
 
 if (!isTestEnvironment)
 {
     builder.Services.AddDbContext<LunchVoteDbContext>(options =>
     {
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        options.UseSqlServer(connectionString);
+        if (useInMemoryDatabase)
+        {
+            // Use in-memory database when no connection string is configured
+            options.UseInMemoryDatabase("LunchVoteInMemoryDb");
+        }
+        else
+        {
+            options.UseSqlServer(connectionString);
+        }
     });
 }
 
@@ -82,6 +91,16 @@ if (app.Environment.IsDevelopment())
     {
         // Ignore if database creation fails (e.g., SQL Server not available)
     }
+}
+
+// Seed mock data when using in-memory database
+if (useInMemoryDatabase && !isTestEnvironment)
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<LunchVoteDbContext>();
+    
+    MockDataSeeder.Seed(dbContext);
+    Console.WriteLine("??? Using in-memory database with mock data (no connection string configured)");
 }
 
 app.Run();

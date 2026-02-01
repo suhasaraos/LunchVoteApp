@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ActivePoll } from '../types';
-import { getActivePoll, submitVote, ApiRequestError } from '../services/api';
+import { ActivePoll, PollResults } from '../types';
+import { getActivePoll, submitVote, createPoll, getPollResults, ApiRequestError } from '../services/api';
 import { getOrCreateVoterToken } from '../services/voterToken';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorMessage } from './ErrorMessage';
 import { OptionCard } from './OptionCard';
+import { ResultBar } from './ResultBar';
 import './VoteScreen.css';
 
 /**
@@ -22,6 +23,8 @@ export function VoteScreen() {
   const [error, setError] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [alreadyVoted, setAlreadyVoted] = useState(false);
+  const [votedOptionId, setVotedOptionId] = useState<string | null>(null);
+  const [results, setResults] = useState<PollResults | null>(null);
 
   const fetchPoll = useCallback(async () => {
     if (!groupId) {
@@ -38,7 +41,9 @@ export function VoteScreen() {
     } catch (err) {
       if (err instanceof ApiRequestError) {
         if (err.statusCode === 404) {
-          setError('No active poll found for this group.');
+          // No active poll found - redirect to create poll screen
+          navigate(`/group/${groupId}/create`);
+          return;
         } else {
           setError(err.message);
         }
@@ -69,11 +74,25 @@ export function VoteScreen() {
         voterToken,
       });
       
+      setVotedOptionId(selectedOptionId);
       setHasVoted(true);
+      
+      // Fetch results after voting
+      const pollResults = await getPollResults(poll.pollId);
+      setResults(pollResults);
     } catch (err) {
       if (err instanceof ApiRequestError) {
         if (err.error === 'AlreadyVoted') {
           setAlreadyVoted(true);
+          // Fetch results to show what they voted for
+          if (poll) {
+            try {
+              const pollResults = await getPollResults(poll.pollId);
+              setResults(pollResults);
+            } catch {
+              // Ignore error fetching results
+            }
+          }
         } else {
           setError(err.message);
         }
@@ -116,23 +135,75 @@ export function VoteScreen() {
   }
 
   if (hasVoted || alreadyVoted) {
+    const getWinnerIds = (): string[] => {
+      if (!results || results.totalVotes === 0) return [];
+      
+      const maxCount = Math.max(...results.results.map(r => r.count));
+      return results.results
+        .filter(r => r.count === maxCount)
+        .map(r => r.optionId);
+    };
+
+    const winnerIds = getWinnerIds();
+
     return (
       <div className="vote-screen">
-        <div className="vote-success">
-          <div className="success-icon">
-            {hasVoted ? '🎉' : '✅'}
-          </div>
-          <h2 className="success-title">
-            {hasVoted ? 'Thank you for voting!' : 'You have already voted'}
-          </h2>
-          <p className="success-message">
-            {hasVoted 
-              ? 'Your vote has been recorded successfully.'
-              : 'You can only vote once per poll from this device.'}
-          </p>
-          <button className="view-results-button" onClick={handleViewResults}>
-            View Results
+        <div className="vote-card">
+          <button onClick={() => navigate('/')} className="home-button" title="Go to Home">
+            🏠 Home
           </button>
+          <div className="group-badge">{poll?.groupId}</div>
+          
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <div className="success-icon" style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+              {hasVoted ? '🎉' : '✅'}
+            </div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+              {hasVoted ? 'Thank you for voting!' : 'You have already voted'}
+            </h2>
+            <p style={{ color: '#666', fontSize: '0.95rem' }}>
+              You can only vote once per poll from this device.
+            </p>
+          </div>
+
+          <h1 className="poll-question">{poll?.question}</h1>
+          
+          {results && (
+            <>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <p style={{ fontSize: '0.9rem', color: '#666', textAlign: 'center' }}>
+                  Total votes: {results.totalVotes}
+                </p>
+              </div>
+              
+              <div className="options-list">
+                {results.results.map((result) => {
+                  const isWinner = winnerIds.includes(result.optionId);
+                  const isUserVote = result.optionId === votedOptionId;
+                  const percentage = results.totalVotes > 0 
+                    ? Math.round((result.count / results.totalVotes) * 100) 
+                    : 0;
+                  
+                  return (
+                    <ResultBar
+                      key={result.optionId}
+                      text={result.text}
+                      count={result.count}
+                      percentage={percentage}
+                      isWinner={isWinner}
+                      highlight={isUserVote}
+                    />
+                  );
+                })}
+              </div>
+
+              {votedOptionId && (
+                <p style={{ textAlign: 'center', marginTop: '1rem', color: '#0969da', fontWeight: '500' }}>
+                  ✓ Your vote: {results.results.find(r => r.optionId === votedOptionId)?.text}
+                </p>
+              )}
+            </>
+          )}
         </div>
       </div>
     );
@@ -141,6 +212,9 @@ export function VoteScreen() {
   return (
     <div className="vote-screen">
       <div className="vote-card">
+        <button onClick={() => navigate('/')} className="home-button" title="Go to Home">
+          🏠 Home
+        </button>
         <div className="group-badge">{poll.groupId}</div>
         <h1 className="poll-question">{poll.question}</h1>
         

@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getAllGroups } from '../services/api';
 import './Home.css';
 
 /**
@@ -7,7 +8,31 @@ import './Home.css';
  */
 export function Home() {
   const [groupId, setGroupId] = useState('');
+  const [availableGroups, setAvailableGroups] = useState<string[]>([]);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const fetchGroups = async () => {
+    try {
+      const groups = await getAllGroups();
+      setAvailableGroups(groups);
+    } catch (error) {
+      // If fetching fails, use default groups
+      setAvailableGroups(['platform', 'security', 'apps', 'data']);
+    }
+  };
+
+  useEffect(() => {
+    fetchGroups();
+    
+    // Also refetch when window regains focus (user returns to tab/window)
+    const handleFocus = () => {
+      fetchGroups();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [location]); // Refetch whenever location changes (navigating back to home)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,8 +40,6 @@ export function Home() {
       navigate(`/group/${groupId.trim().toLowerCase()}`);
     }
   };
-
-  const popularGroups = ['platform', 'security', 'apps', 'data'];
 
   return (
     <div className="home-screen">
@@ -54,16 +77,20 @@ export function Home() {
         <div className="popular-groups">
           <p className="popular-label">Or select a team:</p>
           <div className="group-buttons">
-            {popularGroups.map((group) => (
-              <button
-                key={group}
-                type="button"
-                className="group-chip"
-                onClick={() => navigate(`/group/${group}`)}
-              >
-                {group}
-              </button>
-            ))}
+            {availableGroups.length > 0 ? (
+              availableGroups.map((group) => (
+                <button
+                  key={group}
+                  type="button"
+                  className="group-chip"
+                  onClick={() => navigate(`/group/${group}`)}
+                >
+                  {group}
+                </button>
+              ))
+            ) : (
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>No teams yet. Create one above!</p>
+            )}
           </div>
         </div>
       </div>

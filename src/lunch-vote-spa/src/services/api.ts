@@ -92,3 +92,12 @@ export async function createPoll(
   
   return handleResponse<{ pollId: string }>(response);
 }
+
+/**
+ * Gets all groups that have active polls.
+ */
+export async function getAllGroups(): Promise<string[]> {
+  const response = await fetch(`${API_BASE_URL}/groups`);
+  
+  return handleResponse<string[]>(response);
+}

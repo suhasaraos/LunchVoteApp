@@ -133,4 +133,13 @@ public class PollService : IPollService
             TotalVotes = poll.Votes.Count
         };
     }
+    
+    public async Task<List<string>> GetActiveGroupIdsAsync()
+    {
+        return await _dbContext.Polls
+            .Where(p => p.IsActive)
+            .Select(p => p.GroupId)
+            .Distinct()
+            .ToListAsync();
+    }
 }

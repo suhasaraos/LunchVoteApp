@@ -111,17 +111,27 @@ export function ResultsScreen() {
   return (
     <div className="results-screen">
       <div className="results-card">
+        <button onClick={() => navigate('/')} className="home-button" title="Go to Home">
+          🏠 Home
+        </button>
         <h1 className="results-question">{results.question}</h1>
         
         <div className="results-list">
-          {results.results.map((result) => (
-            <ResultBar
-              key={result.optionId}
-              result={result}
-              totalVotes={results.totalVotes}
-              isWinner={winnerIds.includes(result.optionId)}
-            />
-          ))}
+          {results.results.map((result) => {
+            const percentage = results.totalVotes > 0 
+              ? Math.round((result.count / results.totalVotes) * 100) 
+              : 0;
+            
+            return (
+              <ResultBar
+                key={result.optionId}
+                text={result.text}
+                count={result.count}
+                percentage={percentage}
+                isWinner={winnerIds.includes(result.optionId)}
+              />
+            );
+          })}
         </div>
         
         <div className="results-summary">
