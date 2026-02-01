@@ -1,0 +1,131 @@
+.home-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--suncorp-teal) 0%, var(--suncorp-teal-dark) 100%);
+}
+
+.home-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: white;
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.home-header {
+  margin-bottom: 2rem;
+}
+
+.home-emoji {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.home-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.home-subtitle {
+  color: #64748b;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.group-form {
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  display: block;
+  text-align: left;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.group-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.group-input:focus {
+  outline: none;
+  border-color: var(--suncorp-teal);
+}
+
+.group-input::placeholder {
+  color: #94a3b8;
+}
+
+.go-button {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(90deg, var(--suncorp-gold), var(--suncorp-gold-dark));
+  color: var(--suncorp-text);
+  border: none;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.go-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(255, 184, 28, 0.6);
+}
+
+.go-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.popular-groups {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.popular-label {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0 0 1rem 0;
+}
+
+.group-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.group-chip {
+  padding: 0.5rem 1rem;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.group-chip:hover {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+}

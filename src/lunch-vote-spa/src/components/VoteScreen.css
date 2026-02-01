@@ -1,0 +1,120 @@
+.vote-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--suncorp-teal) 0%, var(--suncorp-teal-dark) 100%);
+}
+
+.vote-card {
+  width: 100%;
+  max-width: 500px;
+  background-color: #f8fafc;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.group-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 122, 109, 0.15);
+  color: var(--suncorp-teal);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.poll-question {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.3;
+}
+
+.options-list {
+  margin-bottom: 1.5rem;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(90deg, var(--suncorp-gold), var(--suncorp-gold-dark));
+  color: var(--suncorp-text);
+  border: none;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(255, 184, 28, 0.6);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Success state */
+.vote-success {
+  text-align: center;
+  padding: 3rem 2rem;
+  background-color: white;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 400px;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.success-message {
+  color: #64748b;
+  margin: 0 0 1.5rem 0;
+}
+
+.view-results-button {
+  padding: 1rem 2rem;
+  background: linear-gradient(90deg, var(--suncorp-teal), var(--suncorp-teal-dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-results-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(0, 122, 109, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .vote-card {
+    padding: 1.5rem;
+  }
+  
+  .poll-question {
+    font-size: 1.5rem;
+  }
+}

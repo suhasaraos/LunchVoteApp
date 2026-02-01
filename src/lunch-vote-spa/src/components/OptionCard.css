@@ -1,0 +1,46 @@
+.option-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  margin-bottom: 0.75rem;
+  background-color: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.125rem;
+  text-align: left;
+}
+
+.option-card:hover:not(.disabled) {
+  border-color: var(--suncorp-teal);
+  background-color: rgba(0, 122, 109, 0.05);
+}
+
+.option-card.selected {
+  border-color: var(--suncorp-gold);
+  background-color: rgba(255, 184, 28, 0.15);
+}
+
+.option-card.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.option-text {
+  flex: 1;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.option-indicator {
+  font-size: 1.5rem;
+  color: var(--suncorp-teal);
+  margin-left: 1rem;
+}
+
+.option-card.selected .option-indicator {
+  color: var(--suncorp-gold-dark);
+}

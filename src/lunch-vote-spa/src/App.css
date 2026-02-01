@@ -1,0 +1,34 @@
+/* Global styles - Suncorp Brand Theme */
+:root {
+  /* Suncorp Brand Colors */
+  --suncorp-teal: #007A6D;
+  --suncorp-teal-dark: #006259;
+  --suncorp-teal-light: #00917F;
+  --suncorp-gold: #FFB81C;
+  --suncorp-gold-dark: #E5A319;
+  --suncorp-gold-light: #FFCA4D;
+  --suncorp-red: #E31837;
+  --suncorp-red-dark: #C41230;
+  --suncorp-white: #FFFFFF;
+  --suncorp-gray-light: #F5F5F5;
+  --suncorp-gray: #6B7280;
+  --suncorp-text: #1F2937;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--suncorp-gray-light);
+}
+
+#root {
+  min-height: 100vh;
+}

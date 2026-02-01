@@ -1,0 +1,53 @@
+.result-bar-container {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+}
+
+.result-bar-container.winner {
+  border-color: var(--suncorp-gold);
+  background-color: rgba(255, 184, 28, 0.1);
+}
+
+.result-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.result-bar-text {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.winner-badge {
+  margin-left: 0.5rem;
+}
+
+.result-bar-count {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.result-bar-track {
+  height: 24px;
+  background-color: #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.result-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--suncorp-teal), var(--suncorp-teal-light));
+  border-radius: 12px;
+  transition: width 0.5s ease-out;
+  min-width: 0;
+}
+
+.result-bar-container.winner .result-bar-fill {
+  background: linear-gradient(90deg, var(--suncorp-gold), var(--suncorp-gold-light));
+}

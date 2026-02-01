@@ -3,6 +3,16 @@
         "/^dotnet --version$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "dotnet build": true,
+        "npm install": true,
+        "dotnet test": true,
+        "brew": true,
+        "/^node --version && npm --version$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "npm run dev": true,
+        "pkill": true
     }
 }
