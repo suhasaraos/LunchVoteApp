@@ -60,7 +60,6 @@ module keyVault 'modules/keyVault.bicep' = {
   params: {
     location: location
     keyVaultName: keyVaultName
-    // appServicePrincipalId: appService.outputs.principalId
   }
 }
 
