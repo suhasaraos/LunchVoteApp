@@ -60,7 +60,16 @@ module keyVault 'modules/keyVault.bicep' = {
   params: {
     location: location
     keyVaultName: keyVaultName
-    appServicePrincipalId: appService.outputs.principalId
+    // appServicePrincipalId: appService.outputs.principalId
+  }
+}
+
+// NEW: Key Vault Access Assignment
+module keyVaultAccess 'modules/keyVaultAccess.bicep' = {
+  name: 'keyVaultAccessDeployment'
+  params: {
+    keyVaultName: keyVault.outputs.keyVaultName
+    principalId: appService.outputs.principalId
   }
 }
 
