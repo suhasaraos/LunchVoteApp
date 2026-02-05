@@ -12,6 +12,7 @@ obj/
 *.nupkg
 project.lock.json
 .idea/
+.vscode
 
 # Node.js
 node_modules/
