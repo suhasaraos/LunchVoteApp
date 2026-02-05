@@ -14,5 +14,6 @@
         },
         "npm run dev": true,
         "pkill": true
-    }
+    },
+    "sarif-viewer.connectToGithubCodeScanning": "off"
 }

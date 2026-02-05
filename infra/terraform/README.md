@@ -4,16 +4,16 @@
 
 ```
 terraform/
-├── main.tf                   # Main configuration
-├── variables.tf              # Variable definitions
-├── outputs.tf                # Output definitions
-├── terraform.tfvars.example  # Example variables
-└── modules/                  # Reusable modules
-    ├── sql_database/
-    ├── key_vault/
-    ├── app_service/
-    ├── key_vault_access/
-    └── static_web_app/
+├── main.tf              # Main orchestration
+├── variables.tf         # Input variables
+├── outputs.tf           # Output values
+├── terraform.tfvars     # Dev environment values
+└── modules/             # Reusable modules
+    ├── app-service/
+    ├── sql-database/
+    ├── key-vault/
+    ├── key-vault-access/
+    └── static-web-app/
 ```
 
 ## Prerequisites
@@ -22,46 +22,57 @@ terraform/
 2. [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
 3. Azure subscription
 
-## Setup
+## Quick Start
 
 ```bash
 # 1. Login to Azure
 az login
 
-# 2. Copy example variables
-cp terraform.tfvars.example terraform.tfvars
+# 2. Navigate to terraform directory
+cd infra/terraform
 
-# 3. Get your credentials
-az ad signed-in-user show --query id -o tsv          # Object ID
-az ad signed-in-user show --query userPrincipalName -o tsv  # Email
-
-# 4. Edit terraform.tfvars with your values
-code terraform.tfvars
-
-# 5. Initialize Terraform
+# 3. Initialize Terraform
 terraform init
 
-# 6. Review the plan
+# 4. Review the plan
 terraform plan
 
-# 7. Apply
+# 5. Apply the configuration
 terraform apply
+
+# 6. View outputs
+terraform output
+```
+
+## Configuration
+
+Edit `terraform.tfvars` to customize your deployment:
+
+```hcl
+environment             = "dev"
+location                = "australiaeast"
+sql_admin_object_id     = "your-object-id"
+sql_admin_login         = "your-email@domain.com"
+deploy_static_web_app   = false
 ```
 
 ## Commands
 
 ```bash
+# Initialize
+terraform init
+
 # Format code
-terraform fmt
+terraform fmt -recursive
 
 # Validate configuration
 terraform validate
 
-# Plan changes
-terraform plan -out=tfplan
+# Plan (preview changes)
+terraform plan
 
 # Apply changes
-terraform apply tfplan
+terraform apply
 
 # Destroy resources
 terraform destroy
@@ -69,16 +80,22 @@ terraform destroy
 # Show current state
 terraform show
 
-# List resources
-terraform state list
+# List outputs
+terraform output
 ```
 
-## Modules
+## Module Dependencies
 
-Each module is self-contained and reusable:
+The modules are deployed in the following order:
+1. SQL Database
+2. Key Vault
+3. App Service (depends on SQL and Key Vault)
+4. Key Vault Access (depends on Key Vault and App Service)
+5. Static Web App (optional)
 
-- **sql_database**: Azure SQL Server + Database with Entra ID auth
-- **key_vault**: Azure Key Vault with RBAC
-- **app_service**: App Service Plan + Web App with managed identity
-- **key_vault_access**: RBAC assignment for Key Vault access
-- **static_web_app**: Azure Static Web App (optional)
+## Notes
+
+- Resource Group is created automatically as `rg-lunchvote-{environment}`
+- All resources use passwordless authentication with Microsoft Entra ID
+- Key Vault uses RBAC authorization (not access policies)
+- Static Web App is optional and controlled by `deploy_static_web_app` variable

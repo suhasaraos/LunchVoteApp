@@ -1,9 +1,0 @@
-environment  = "dev"
-location     = "eastus"
-project_name = "lunchvote"
-
-tags = {
-  Environment = "dev"
-  Project     = "LunchVoteApp"
-  ManagedBy   = "Terraform"
-}

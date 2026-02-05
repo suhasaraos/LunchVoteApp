@@ -1,6 +1,16 @@
-output "resource_group_name" {
-  description = "Name of the resource group"
-  value       = azurerm_resource_group.rg.name
+output "app_service_name" {
+  description = "Name of the App Service"
+  value       = module.app_service.app_service_name
+}
+
+output "app_service_default_hostname" {
+  description = "Default hostname of the App Service"
+  value       = module.app_service.default_hostname
+}
+
+output "app_service_principal_id" {
+  description = "Principal ID of the App Service managed identity"
+  value       = module.app_service.principal_id
 }
 
 output "sql_server_fqdn" {
@@ -10,7 +20,7 @@ output "sql_server_fqdn" {
 
 output "sql_database_name" {
   description = "Name of the SQL Database"
-  value       = local.sql_database_name
+  value       = module.sql_database.database_name
 }
 
 output "key_vault_uri" {
@@ -18,17 +28,7 @@ output "key_vault_uri" {
   value       = module.key_vault.key_vault_uri
 }
 
-output "app_service_name" {
-  description = "Name of the App Service"
-  value       = module.app_service.app_service_name
-}
-
-output "app_service_url" {
-  description = "URL of the App Service"
-  value       = module.app_service.app_service_url
-}
-
-output "static_web_app_url" {
-  description = "URL of the Static Web App"
-  value       = var.deploy_static_web_app ? module.static_web_app[0].default_hostname : null
+output "static_web_app_default_hostname" {
+  description = "Default hostname of the Static Web App"
+  value       = var.deploy_static_web_app ? module.static_web_app[0].default_hostname : ""
 }
