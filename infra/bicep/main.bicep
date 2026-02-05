@@ -89,4 +89,4 @@ output appServicePrincipalId string = appService.outputs.principalId
 output sqlServerFqdn string = sqlDatabase.outputs.sqlServerFqdn
 output sqlDatabaseName string = sqlDatabase.outputs.databaseName
 output keyVaultUri string = keyVault.outputs.keyVaultUri
-output staticWebAppDefaultHostname string = deployStaticWebApp ? staticWebApp.outputs.defaultHostname : ''
+output staticWebAppDefaultHostname string = deployStaticWebApp ? staticWebApp!.outputs.defaultHostname : ''
