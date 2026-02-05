@@ -1,0 +1,11 @@
+# Bicep build output
+*.json
+!**/azuredeploy.json
+!**/azuredeploy.parameters.json
+
+# Parameter files with secrets
+*.parameters.*.json
+*-parameters.json
+
+# Lock files
+bicepconfig.lock.json
