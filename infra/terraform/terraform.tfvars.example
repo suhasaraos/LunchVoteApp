@@ -1,0 +1,20 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+resource_group_name = "rg-lunchvote-dev"
+location            = "eastus"
+environment         = "dev"
+
+# Get your Object ID: az ad signed-in-user show --query id -o tsv
+sql_admin_object_id = "YOUR_ENTRA_ID_OBJECT_ID_HERE"
+
+# Get your email: az ad signed-in-user show --query userPrincipalName -o tsv
+sql_admin_login = "YOUR_EMAIL_HERE"
+
+deploy_static_web_app   = true
+static_web_app_location = "eastus2"
+
+tags = {
+  Environment = "dev"
+  Project     = "LunchVoteApp"
+  ManagedBy   = "Terraform"
+}

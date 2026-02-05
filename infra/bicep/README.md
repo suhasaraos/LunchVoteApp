@@ -2,38 +2,71 @@
 
 ## Structure
 
-- `environments/` - Environment-specific deployments (dev, staging, prod)
-- `modules/` - Reusable Bicep modules
-- `shared/` - Shared parameter files and configurations
-
-## Usage
-
-### Build Bicep to ARM Template
-```bash
-az bicep build --file main.bicep
+```
+bicep/
+├── main.bicep              # Main template
+├── parameters.dev.json     # Dev parameters
+└── modules/                # Reusable modules
+    ├── sql-database.bicep
+    ├── key-vault.bicep
+    ├── app-service.bicep
+    ├── key-vault-access.bicep
+    └── static-web-app.bicep
 ```
 
-### Deploy to Azure
+## Prerequisites
+
+1. [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
+2. Bicep CLI: `az bicep install`
+3. Azure subscription
+
+## Quick Start
+
 ```bash
+# 1. Login
+az login
+
+# 2. Get credentials
+az ad signed-in-user show --query id -o tsv          # Object ID
+az ad signed-in-user show --query userPrincipalName -o tsv  # Email
+
+# 3. Edit parameters
+code parameters.dev.json
+
+# 4. Create resource group
+az group create --name rg-lunchvote-dev --location eastus
+
+# 5. Deploy
 az deployment group create \
   --resource-group rg-lunchvote-dev \
   --template-file main.bicep \
-  --parameters @parameters.dev.json
+  --parameters parameters.dev.json
 ```
 
-### Validate Deployment
+## Commands
+
 ```bash
+# Build (syntax check)
+az bicep build --file main.bicep
+
+# What-if analysis
+az deployment group what-if \
+  --resource-group rg-lunchvote-dev \
+  --template-file main.bicep \
+  --parameters parameters.dev.json
+
+# Validate
 az deployment group validate \
   --resource-group rg-lunchvote-dev \
   --template-file main.bicep \
-  --parameters @parameters.dev.json
+  --parameters parameters.dev.json
+
+# Deploy
+az deployment group create \
+  --resource-group rg-lunchvote-dev \
+  --template-file main.bicep \
+  --parameters parameters.dev.json
+
+# Delete
+az group delete --name rg-lunchvote-dev --yes
 ```
-
-## Best Practices
-
-1. Use modules for reusable components
-2. Parameterize all configurable values
-3. Use parameter files for environment-specific values
-4. Add descriptions to all parameters
-5. Use resource symbolic names consistently
-6. Leverage Bicep's type safety

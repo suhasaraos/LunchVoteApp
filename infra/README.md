@@ -6,40 +6,44 @@ This directory contains all Infrastructure as Code (IaC) for the LunchVoteApp pr
 
 ```
 infra/
-├── terraform/     # Terraform configurations
-├── bicep/         # Bicep configurations
-└── README.md      # This file
+├── README.md          # This file
+├── terraform/         # Terraform IaC
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── terraform.tfvars.example
+│   └── modules/
+└── bicep/             # Bicep IaC
+    ├── main.bicep
+    ├── parameters.dev.json
+    └── modules/
 ```
-
-## Choosing Between Terraform and Bicep
-
-- **Terraform**: Multi-cloud support, larger ecosystem, HashiCorp Configuration Language (HCL)
-- **Bicep**: Azure-native, simpler syntax, tight integration with Azure Resource Manager
 
 ## Quick Start
 
 ### Terraform
 ```bash
-cd terraform/environments/dev
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your values
 terraform init
-terraform plan -var-file="terraform.tfvars"
+terraform plan
 terraform apply
 ```
 
 ### Bicep
 ```bash
-cd bicep/environments/dev
+cd bicep
+# Edit parameters.dev.json with your values
 az deployment group create \
   --resource-group rg-lunchvote-dev \
   --template-file main.bicep \
-  --parameters @parameters.dev.json
+  --parameters parameters.dev.json
 ```
 
-## Best Practices
+## Choosing Between Terraform and Bicep
 
-1. Use environment-specific configurations
-2. Leverage modules for reusability
-3. Keep secrets in Azure Key Vault, not in code
-4. Use remote state management (Terraform) or deployment history (Bicep)
-5. Tag all resources consistently
-6. Document all infrastructure changes
+- **Terraform**: Use if you need multi-cloud support or prefer HCL syntax
+- **Bicep**: Use if you're Azure-only and want native ARM integration
+
+Both implement the same infrastructure.

@@ -2,32 +2,83 @@
 
 ## Structure
 
-- `environments/` - Environment-specific configurations (dev, staging, prod)
-- `modules/` - Reusable Terraform modules
-- `shared/` - Shared variables and configurations
+```
+terraform/
+├── main.tf                   # Main configuration
+├── variables.tf              # Variable definitions
+├── outputs.tf                # Output definitions
+├── terraform.tfvars.example  # Example variables
+└── modules/                  # Reusable modules
+    ├── sql_database/
+    ├── key_vault/
+    ├── app_service/
+    ├── key_vault_access/
+    └── static_web_app/
+```
 
-## Usage
+## Prerequisites
 
-### Initialize Terraform
+1. [Terraform](https://www.terraform.io/downloads) >= 1.0
+2. [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
+3. Azure subscription
+
+## Setup
+
 ```bash
-cd environments/dev
+# 1. Login to Azure
+az login
+
+# 2. Copy example variables
+cp terraform.tfvars.example terraform.tfvars
+
+# 3. Get your credentials
+az ad signed-in-user show --query id -o tsv          # Object ID
+az ad signed-in-user show --query userPrincipalName -o tsv  # Email
+
+# 4. Edit terraform.tfvars with your values
+code terraform.tfvars
+
+# 5. Initialize Terraform
 terraform init
+
+# 6. Review the plan
+terraform plan
+
+# 7. Apply
+terraform apply
 ```
 
-### Plan Changes
+## Commands
+
 ```bash
-terraform plan -var-file="terraform.tfvars"
+# Format code
+terraform fmt
+
+# Validate configuration
+terraform validate
+
+# Plan changes
+terraform plan -out=tfplan
+
+# Apply changes
+terraform apply tfplan
+
+# Destroy resources
+terraform destroy
+
+# Show current state
+terraform show
+
+# List resources
+terraform state list
 ```
 
-### Apply Changes
-```bash
-terraform apply -var-file="terraform.tfvars"
-```
+## Modules
 
-## Best Practices
+Each module is self-contained and reusable:
 
-1. Use remote state (Azure Storage, Terraform Cloud, etc.)
-2. Use workspaces for environment isolation
-3. Keep modules generic and reusable
-4. Use variables for all configurable values
-5. Version your modules
+- **sql_database**: Azure SQL Server + Database with Entra ID auth
+- **key_vault**: Azure Key Vault with RBAC
+- **app_service**: App Service Plan + Web App with managed identity
+- **key_vault_access**: RBAC assignment for Key Vault access
+- **static_web_app**: Azure Static Web App (optional)

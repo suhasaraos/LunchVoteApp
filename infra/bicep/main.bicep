@@ -1,3 +1,4 @@
+
 // Main orchestration template for Lunch Vote App infrastructure
 // Deploys App Service, SQL Database, Key Vault, and Static Web App
 
@@ -29,7 +30,7 @@ var keyVaultName = 'kv-lunchvote${resourceSuffix}'
 var staticWebAppName = 'stapp-lunchvote${resourceSuffix}'
 
 // App Service Module
-module appService 'modules/appService.bicep' = {
+module appService 'modules/app-service.bicep' = {
   name: 'appServiceDeployment'
   params: {
     location: location
@@ -43,7 +44,7 @@ module appService 'modules/appService.bicep' = {
 }
 
 // SQL Database Module
-module sqlDatabase 'modules/sqlDatabase.bicep' = {
+module sqlDatabase 'modules/sql-database.bicep' = {
   name: 'sqlDatabaseDeployment'
   params: {
     location: location
@@ -55,7 +56,7 @@ module sqlDatabase 'modules/sqlDatabase.bicep' = {
 }
 
 // Key Vault Module
-module keyVault 'modules/keyVault.bicep' = {
+module keyVault 'modules/key-vault.bicep' = {
   name: 'keyVaultDeployment'
   params: {
     location: location
@@ -64,7 +65,7 @@ module keyVault 'modules/keyVault.bicep' = {
 }
 
 // NEW: Key Vault Access Assignment
-module keyVaultAccess 'modules/keyVaultAccess.bicep' = {
+module keyVaultAccess 'modules/key-vault-access.bicep' = {
   name: 'keyVaultAccessDeployment'
   params: {
     keyVaultName: keyVault.outputs.keyVaultName
@@ -73,7 +74,7 @@ module keyVaultAccess 'modules/keyVaultAccess.bicep' = {
 }
 
 // Static Web App Module (optional)
-module staticWebApp 'modules/staticWebApp.bicep' = if (deployStaticWebApp) {
+module staticWebApp 'modules/static-web-app.bicep' = if (deployStaticWebApp) {
   name: 'staticWebAppDeployment'
   params: {
     location: location
