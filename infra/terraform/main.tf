@@ -32,7 +32,6 @@ resource "azurerm_resource_group" "main" {
 # SQL Database Module
 module "sql_database" {
   source = "./modules/sql-database"
-
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   sql_server_name     = "sql-lunchvote-${var.environment}"
@@ -45,7 +44,6 @@ module "sql_database" {
 # Key Vault Module
 module "key_vault" {
   source = "./modules/key-vault"
-
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   key_vault_name      = "kv-lunchvote-${var.environment}"
@@ -55,7 +53,6 @@ module "key_vault" {
 # App Service Module
 module "app_service" {
   source = "./modules/app-service"
-
   location               = azurerm_resource_group.main.location
   resource_group_name    = azurerm_resource_group.main.name
   app_service_plan_name  = "plan-lunchvote-${var.environment}"
@@ -69,7 +66,6 @@ module "app_service" {
 # Key Vault Access Module
 module "key_vault_access" {
   source = "./modules/key-vault-access"
-
   key_vault_id = module.key_vault.key_vault_id
   principal_id = module.app_service.principal_id
 }
@@ -78,7 +74,6 @@ module "key_vault_access" {
 module "static_web_app" {
   count  = var.deploy_static_web_app ? 1 : 0
   source = "./modules/static-web-app"
-
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   static_web_app_name = "stapp-lunchvote-${var.environment}"
