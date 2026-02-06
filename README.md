@@ -249,17 +249,29 @@ deploy_static_web_app   = false
 
 ### Deploy Backend
 
+The deployment process uses zip deployment to Azure App Service.
+
 ```bash
 cd src/LunchVoteApi
+
+# Build and publish the application
 dotnet publish -c Release -o ./publish
 
-# Deploy using Azure CLI
+# Create a zip archive from the published output
+Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force
+
+# Deploy the zip archive to Azure App Service
 az webapp deploy \
   --resource-group rg-lunchvote-dev \
   --name app-lunchvote-api-dev \
-  --src-path ./publish \
+  --src-path ./publish.zip \
   --type zip
+
+# Clean up
+Remove-Item ./publish.zip
 ```
+
+**Note:** The `az webapp deploy` command with `--type zip` performs a zip deployment. 
 
 ### Deploy Frontend
 
