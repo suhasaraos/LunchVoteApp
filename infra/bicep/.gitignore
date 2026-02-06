@@ -1,0 +1,20 @@
+# Bicep build output
+*.json
+!**/azuredeploy.json
+!**/azuredeploy.parameters.json
+!bicepconfig.json
+!parameters.*.json
+
+# Parameter files with secrets (if named differently)
+*-parameters.json
+
+# Lock files
+bicepconfig.lock.json
+
+# Old structure - ignore if exists
+environments/
+
+# Test artifacts
+main.json
+test-results/
+*.log

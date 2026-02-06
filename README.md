@@ -11,7 +11,9 @@ LunchVoteApp/
 │   └── lunch-vote-spa/        # React + Vite + TypeScript SPA
 ├── tests/
 │   └── LunchVoteApi.Tests/    # Backend unit & integration tests
-├── infra/                     # Azure Bicep IaC templates
+├── infra/
+│   ├── bicep/                 # Azure Bicep IaC templates
+│   └── terraform/             # Terraform IaC templates
 └── LunchVoteApp.sln           # Visual Studio solution file
 ```
 
@@ -39,6 +41,7 @@ LunchVoteApp/
 - Node.js 20+
 - Docker (optional, for local SQL Server)
 - Azure CLI
+- Bicep CLI or Terraform (for infrastructure deployment)
 
 ## Local Development
 
@@ -96,17 +99,80 @@ npm test
 
 ## Deployment
 
-### Deploy Infrastructure
+You can deploy the infrastructure using either **Bicep** or **Terraform**.
+
+### Option 1: Deploy with Bicep
+
+#### Deploy Infrastructure
 
 ```bash
+# Login to Azure
+az login
+
+# Get your credentials
+az ad signed-in-user show --query id -o tsv          # Object ID
+az ad signed-in-user show --query userPrincipalName -o tsv  # Email
+
+# Edit parameters
+code infra/bicep/parameters.dev.json
+
 # Create resource group
 az group create --name rg-lunchvote-dev --location australiaeast
 
 # Deploy Bicep templates
 az deployment group create \
   --resource-group rg-lunchvote-dev \
-  --template-file infra/main.bicep \
-  --parameters infra/main.bicepparam
+  --template-file infra/bicep/main.bicep \
+  --parameters infra/bicep/parameters.dev.json
+```
+
+### Option 2: Deploy with Terraform
+
+#### Deploy Infrastructure
+
+```bash
+# Login to Azure
+az login
+
+# Navigate to terraform directory
+cd infra/terraform
+
+# Edit variables (update SQL admin credentials)
+code terraform.tfvars
+
+# Initialize Terraform
+terraform init
+
+# Review the deployment plan
+terraform plan
+
+# Deploy infrastructure
+terraform apply
+
+# View outputs
+terraform output
+```
+
+#### Terraform Resources Created
+
+- Resource Group: `rg-lunchvote-dev`
+- App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
+- App Service: `app-lunchvote-api-dev` (.NET 8.0)
+- SQL Server: `sql-lunchvote-dev` (Entra ID auth only)
+- SQL Database: `sqldb-lunchvote` (Basic tier, 2GB)
+- Key Vault: `kv-lunchvote-dev` (RBAC enabled)
+- Static Web App: `stapp-lunchvote-dev` (optional)
+
+#### Terraform Configuration
+
+Edit `infra/terraform/terraform.tfvars`:
+
+```hcl
+environment             = "dev"
+location                = "australiaeast"
+sql_admin_object_id     = "your-object-id"          # Get from: az ad signed-in-user show --query id -o tsv
+sql_admin_login         = "your-email@domain.com"   # Get from: az ad signed-in-user show --query userPrincipalName -o tsv
+deploy_static_web_app   = false
 ```
 
 ### Deploy Backend
@@ -114,7 +180,13 @@ az deployment group create \
 ```bash
 cd src/LunchVoteApi
 dotnet publish -c Release -o ./publish
-az webapp deploy --resource-group rg-lunchvote-dev --name app-lunchvote-api-dev --src-path ./publish --type zip
+
+# Deploy using Azure CLI
+az webapp deploy \
+  --resource-group rg-lunchvote-dev \
+  --name app-lunchvote-api-dev \
+  --src-path ./publish \
+  --type zip
 ```
 
 ### Deploy Frontend
@@ -122,8 +194,20 @@ az webapp deploy --resource-group rg-lunchvote-dev --name app-lunchvote-api-dev 
 ```bash
 cd src/lunch-vote-spa
 npm run build
+
 # Deploy to Azure Static Web Apps or copy to API wwwroot
 ```
+
+## Infrastructure Features
+
+Both Bicep and Terraform deployments include:
+
+- ✅ **Passwordless Authentication**: SQL Server uses Microsoft Entra ID authentication
+- ✅ **Managed Identity**: App Service uses System-Assigned Managed Identity
+- ✅ **RBAC Authorization**: Key Vault uses role-based access control
+- ✅ **Security**: TLS 1.2+, HTTPS-only, soft delete enabled
+- ✅ **Environment Isolation**: Resources named with environment suffix (`-dev`, `-stg`, `-prod`)
+- ✅ **CORS Configuration**: Pre-configured for local development and Azure Static Apps
 
 ## Sample Usage
 

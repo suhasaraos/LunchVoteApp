@@ -1,3 +1,4 @@
+
 // Main orchestration template for Lunch Vote App infrastructure
 // Deploys App Service, SQL Database, Key Vault, and Static Web App
 
@@ -29,7 +30,7 @@ var keyVaultName = 'kv-lunchvote${resourceSuffix}'
 var staticWebAppName = 'stapp-lunchvote${resourceSuffix}'
 
 // App Service Module
-module appService 'modules/appService.bicep' = {
+module appService 'modules/app-service.bicep' = {
   name: 'appServiceDeployment'
   params: {
     location: location
@@ -43,7 +44,7 @@ module appService 'modules/appService.bicep' = {
 }
 
 // SQL Database Module
-module sqlDatabase 'modules/sqlDatabase.bicep' = {
+module sqlDatabase 'modules/sql-database.bicep' = {
   name: 'sqlDatabaseDeployment'
   params: {
     location: location
@@ -55,17 +56,25 @@ module sqlDatabase 'modules/sqlDatabase.bicep' = {
 }
 
 // Key Vault Module
-module keyVault 'modules/keyVault.bicep' = {
+module keyVault 'modules/key-vault.bicep' = {
   name: 'keyVaultDeployment'
   params: {
     location: location
     keyVaultName: keyVaultName
-    appServicePrincipalId: appService.outputs.principalId
+  }
+}
+
+// NEW: Key Vault Access Assignment
+module keyVaultAccess 'modules/key-vault-access.bicep' = {
+  name: 'keyVaultAccessDeployment'
+  params: {
+    keyVaultName: keyVault.outputs.keyVaultName
+    principalId: appService.outputs.principalId
   }
 }
 
 // Static Web App Module (optional)
-module staticWebApp 'modules/staticWebApp.bicep' = if (deployStaticWebApp) {
+module staticWebApp 'modules/static-web-app.bicep' = if (deployStaticWebApp) {
   name: 'staticWebAppDeployment'
   params: {
     location: location
@@ -80,4 +89,4 @@ output appServicePrincipalId string = appService.outputs.principalId
 output sqlServerFqdn string = sqlDatabase.outputs.sqlServerFqdn
 output sqlDatabaseName string = sqlDatabase.outputs.databaseName
 output keyVaultUri string = keyVault.outputs.keyVaultUri
-output staticWebAppDefaultHostname string = deployStaticWebApp ? staticWebApp.outputs.defaultHostname : ''
+output staticWebAppDefaultHostname string = deployStaticWebApp ? staticWebApp!.outputs.defaultHostname : ''

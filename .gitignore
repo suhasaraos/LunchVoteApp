@@ -12,6 +12,7 @@ obj/
 *.nupkg
 project.lock.json
 .idea/
+.vscode
 
 # Node.js
 node_modules/
@@ -47,3 +48,20 @@ npm-debug.log*
 # Test results
 TestResults/
 coverage/
+
+# Infrastructure as Code
+infra/terraform/**/.terraform/*
+infra/terraform/**/*.tfstate
+infra/terraform/**/*.tfstate.*
+infra/terraform/**/*.tfvars
+infra/terraform/**/.terraformrc
+infra/terraform/**/terraform.rc
+
+infra/bicep/**/*.json
+!infra/bicep/**/bicepconfig.json
+!infra/bicep/**/azuredeploy.json
+!infra/bicep/**/azuredeploy.parameters.json
+infra/bicep/**/*.parameters.*.json
+
+# VS Code
+.vscode/
