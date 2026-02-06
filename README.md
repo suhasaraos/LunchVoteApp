@@ -43,6 +43,78 @@ LunchVoteApp/
 - Azure CLI
 - Bicep CLI or Terraform (for infrastructure deployment)
 
+## Environment Setup
+
+### .NET SDK Installation
+
+Check your current .NET version:
+
+```powershell
+dotnet --version
+```
+
+List installed SDKs:
+
+```powershell
+dotnet --list-sdks
+```
+
+If you need to install .NET 10.0, use the official installer script:
+
+```powershell
+# Download the installer script
+Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile dotnet-install.ps1
+
+# Install .NET 10.0
+.\dotnet-install.ps1 -Channel 10.0 -InstallDir "$env:USERPROFILE\.dotnet"
+
+# Add to PATH (current session)
+$env:PATH="$env:USERPROFILE\.dotnet;$env:PATH"
+
+# Verify installation
+dotnet --version
+```
+
+### Node.js Installation
+
+To install Node.js v20.11.1 manually on Windows:
+
+```powershell
+# Download Node.js
+Invoke-WebRequest -Uri "https://nodejs.org/dist/v20.11.1/node-v20.11.1-win-x64.zip" -OutFile "$env:USERPROFILE\Downloads\node.zip"
+
+# Extract to .nodejs folder
+Expand-Archive -Path "$env:USERPROFILE\Downloads\node.zip" -DestinationPath "$env:USERPROFILE\.nodejs" -Force
+
+# Move files to parent directory
+Move-Item "$env:USERPROFILE\.nodejs\node-v20.11.1-win-x64\*" "$env:USERPROFILE\.nodejs\"
+
+# Add to PATH (current session)
+$env:PATH="$env:USERPROFILE\.nodejs;$env:PATH"
+```
+
+### Terraform Version
+
+This project uses **Terraform v1.11.4**. Ensure you have this version or higher installed.
+
+### Azure CLI
+
+Verify Azure CLI installation:
+
+```powershell
+az version
+```
+
+### Important Notes
+
+- **Application Insights**: Application Insights is disabled due to Suncorp Azure policy restrictions. The deployment will fail if you attempt to provision Application Insights resources.
+  
+  Policy error reference:
+  ```
+  Resource was disallowed by policy: 'Deny Usage of Application Insights'
+  Policy Assignment: 'Suncorp Azure MSB (Misc)'
+  ```
+
 ## Local Development
 
 ### Start SQL Server (Docker)
