@@ -30,10 +30,9 @@ LunchVoteApp/
 - TypeScript 5+
 
 ### Infrastructure
-- Azure App Service
+- Azure App Service (Backend API + Frontend SPA)
 - Azure SQL Database
 - Azure Key Vault
-- Azure Static Web Apps (optional)
 
 ## Prerequisites
 
@@ -138,13 +137,7 @@ az version
 
 ### Important Notes
 
-- **Application Insights**: Application Insights is disabled due to Suncorp Azure policy restrictions. The deployment will fail if you attempt to provision Application Insights resources.
-  
-  Policy error reference:
-  ```
-  Resource was disallowed by policy: 'Deny Usage of Application Insights'
-  Policy Assignment: 'Suncorp Azure MSB (Misc)'
-  ```
+- **Resource Naming**: Terraform resources include a random 6-character suffix to ensure global uniqueness (e.g., `app-lunchvote-api-dev-a1b2c3`).
 
 ## Local Development
 
@@ -163,7 +156,9 @@ cd src/LunchVoteApi
 dotnet run
 ```
 
-The API will be available at `http://localhost:5000`
+The API will be available at:
+- `https://localhost:52544` (HTTPS)
+- `http://localhost:52545` (HTTP)
 
 ### Start Frontend
 
@@ -183,6 +178,7 @@ The SPA will be available at `http://localhost:5173`
 | GET | `/api/polls/active?groupId={groupId}` | Get active poll for a group |
 | GET | `/api/polls/{pollId}/results` | Get poll results |
 | POST | `/api/votes` | Submit a vote |
+| GET | `/api/groups` | Get all group IDs with active polls |
 
 ## Testing
 
@@ -191,13 +187,6 @@ The SPA will be available at `http://localhost:5173`
 ```bash
 cd tests/LunchVoteApi.Tests
 dotnet test
-```
-
-### Frontend Tests
-
-```bash
-cd src/lunch-vote-spa
-npm test
 ```
 
 ## Deployment
@@ -228,6 +217,18 @@ az deployment group create \
   --template-file infra/bicep/main.bicep \
   --parameters infra/bicep/parameters.dev.json
 ```
+
+#### Bicep Resources Created
+
+- Resource Group: `rg-lunchvote-dev`
+- Backend App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
+- Backend App Service: `app-lunchvote-api-dev` (.NET 10.0)
+- Frontend App Service Plan: `plan-lunchvote-spa-dev` (Linux, B1 SKU)
+- Frontend App Service: `app-lunchvote-spa-dev` (Node.js 20 LTS)
+- SQL Server: `sql-lunchvote-dev` (Entra ID auth only)
+- SQL Database: `sqldb-lunchvote` (Basic tier, 2GB)
+- Key Vault: `kv-lunchvote-dev` (RBAC enabled)
+- Static Web App: `stapp-lunchvote-dev` (optional, disabled by default)
 
 ### Option 2: Deploy with Terraform
 
@@ -260,12 +261,16 @@ terraform output
 #### Terraform Resources Created
 
 - Resource Group: `rg-lunchvote-dev`
-- App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
-- App Service: `app-lunchvote-api-dev` (.NET 8.0)
+- Backend App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
+- Backend App Service: `app-lunchvote-api-dev-{random}` (.NET 8.0)
+- Frontend App Service Plan: `plan-lunchvote-spa-dev` (Linux, B1 SKU)
+- Frontend App Service: `app-lunchvote-spa-dev-{random}` (Node.js 20 LTS)
 - SQL Server: `sql-lunchvote-dev` (Entra ID auth only)
 - SQL Database: `sqldb-lunchvote` (Basic tier, 2GB)
 - Key Vault: `kv-lunchvote-dev` (RBAC enabled)
-- Static Web App: `stapp-lunchvote-dev` (optional)
+- Static Web App: `stapp-lunchvote-dev` (optional, disabled by default)
+
+**Note:** The Terraform Azure App Service provider currently supports .NET 8.0 as the runtime. While the application code is built with .NET 10.0, it runs on the .NET 8.0 runtime in Azure. For full .NET 10.0 runtime support, use the Bicep deployment option instead.
 
 #### Terraform Configuration
 
@@ -315,36 +320,51 @@ Remove-Item ./publish.zip
 cd src/lunch-vote-spa
 npm run build
 
-# Deploy to Azure Static Web Apps or copy to API wwwroot
+# Deploy to Frontend App Service
+Compress-Archive -Path ./dist/* -DestinationPath ./dist.zip -Force
+
+az webapp deploy \
+  --resource-group rg-lunchvote-dev \
+  --name app-lunchvote-spa-dev-{random-suffix} \
+  --src-path ./dist.zip \
+  --type zip
+
+# Clean up
+Remove-Item ./dist.zip
 ```
+
+**Note:** Replace `{random-suffix}` with the actual suffix from your Terraform deployment output.
 
 ## Infrastructure Features
 
 Both Bicep and Terraform deployments include:
 
 - ✅ **Passwordless Authentication**: SQL Server uses Microsoft Entra ID authentication
-- ✅ **Managed Identity**: App Service uses System-Assigned Managed Identity
+- ✅ **Managed Identity**: App Services use System-Assigned Managed Identity
 - ✅ **RBAC Authorization**: Key Vault uses role-based access control
 - ✅ **Security**: TLS 1.2+, HTTPS-only, soft delete enabled
 - ✅ **Environment Isolation**: Resources named with environment suffix (`-dev`, `-stg`, `-prod`)
-- ✅ **CORS Configuration**: Pre-configured for local development and Azure Static Apps
+- ✅ **CORS Configuration**: Pre-configured for local development
+- ✅ **Dual App Service Architecture**: Separate App Services for Backend API and Frontend SPA
 
 ## Sample Usage
 
 ### Create a Poll
 
 ```bash
-curl -X POST http://localhost:5000/api/polls \
+curl -X POST https://localhost:52544/api/polls \
   -H "Content-Type: application/json" \
-  -d '{"groupId":"platform","question":"Where should we eat today?","options":["Sushi","Burgers","Thai","Pizza"]}'
+  -d '{"groupId":"platform","question":"Where should we eat today?","options":["Sushi","Burgers","Thai","Pizza"]}' \
+  -k
 ```
 
 ### Vote
 
 ```bash
-curl -X POST http://localhost:5000/api/votes \
+curl -X POST https://localhost:52544/api/votes \
   -H "Content-Type: application/json" \
-  -d '{"pollId":"<poll-id>","optionId":"<option-id>","voterToken":"my-unique-token"}'
+  -d '{"pollId":"<poll-id>","optionId":"<option-id>","voterToken":"my-unique-token"}' \
+  -k
 ```
 
 ## License

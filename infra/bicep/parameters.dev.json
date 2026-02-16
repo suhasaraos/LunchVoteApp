@@ -1,6 +1,6 @@
 {
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
-  "\\": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "parameters": {
     "sqlAdminObjectId": {
       "value": "b2da91ea-2c20-467d-9015-da0adbfd58c9"
