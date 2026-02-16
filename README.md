@@ -237,20 +237,25 @@ az deployment group create \
 # Login to Azure
 az login
 
+# Get your credentials
+OBJECT_ID=$(az ad signed-in-user show --query id -o tsv)
+EMAIL=$(az ad signed-in-user show --query userPrincipalName -o tsv)
+
 # Navigate to terraform directory
 cd infra/terraform
-
-# Edit variables (update SQL admin credentials)
-code terraform.tfvars
 
 # Initialize Terraform
 terraform init
 
 # Review the deployment plan
-terraform plan
+terraform plan \
+  -var="sql_admin_object_id=$OBJECT_ID" \
+  -var="sql_admin_login=$EMAIL"
 
 # Deploy infrastructure
-terraform apply
+terraform apply \
+  -var="sql_admin_object_id=$OBJECT_ID" \
+  -var="sql_admin_login=$EMAIL"
 
 # View outputs
 terraform output
@@ -268,15 +273,19 @@ terraform output
 
 #### Terraform Configuration
 
-Edit `infra/terraform/terraform.tfvars`:
+The deployment uses command-line variables. If you want to customize defaults, you can override them:
 
-```hcl
-environment             = "dev"
-location                = "australiaeast"
-sql_admin_object_id     = "your-object-id"          # Get from: az ad signed-in-user show --query id -o tsv
-sql_admin_login         = "your-email@domain.com"   # Get from: az ad signed-in-user show --query userPrincipalName -o tsv
-deploy_static_web_app   = false
+```bash
+# Optional: Override default values
+terraform apply \
+  -var="sql_admin_object_id=$OBJECT_ID" \
+  -var="sql_admin_login=$EMAIL" \
+  -var="environment=dev" \
+  -var="location=australiaeast" \
+  -var="deploy_static_web_app=false"
 ```
+
+**Note:** Alternatively, you can create an optional `terraform.tfvars` file (already in .gitignore) with these values to avoid passing them on every command.
 
 ### Deploy Backend
 
