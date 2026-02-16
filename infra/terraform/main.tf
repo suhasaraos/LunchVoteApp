@@ -36,7 +36,6 @@ module "key_vault" {
 # App Service Module
 module "app_service" {
   source = "./modules/app-service"
-
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
   app_service_plan_name = "plan-${var.name}-${var.env}"
@@ -44,7 +43,7 @@ module "app_service" {
   sql_server_fqdn       = module.sql_database.sql_server_fqdn
   sql_database_name     = module.sql_database.database_name
   key_vault_uri         = module.key_vault.key_vault_uri
-  env                   = var.env
+  environment           = var.env
 }
 
 # Key Vault Access Module
