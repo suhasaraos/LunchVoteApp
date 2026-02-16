@@ -43,7 +43,7 @@ module "app_service" {
   sql_server_fqdn       = module.sql_database.sql_server_fqdn
   sql_database_name     = module.sql_database.database_name
   key_vault_uri         = module.key_vault.key_vault_uri
-  environment           = var.env
+  env                   = var.env
 }
 
 # Key Vault Access Module
