@@ -93,9 +93,36 @@ Move-Item "$env:USERPROFILE\.nodejs\node-v20.11.1-win-x64\*" "$env:USERPROFILE\.
 $env:PATH="$env:USERPROFILE\.nodejs;$env:PATH"
 ```
 
-### Terraform Version
+### Terraform Installation
 
-This project uses **Terraform v1.11.4**. Ensure you have this version or higher installed.
+This project uses **Terraform v1.11.4**.
+
+**Windows Installation:**
+
+Download and install Terraform v1.11.4:
+
+```powershell
+# Download Terraform for Windows
+Invoke-WebRequest -Uri "https://releases.hashicorp.com/terraform/1.11.4/terraform_1.11.4_windows_amd64.zip" -OutFile "$env:USERPROFILE\Downloads\terraform.zip"
+
+# Extract to a local directory (e.g., C:\terraform)
+Expand-Archive -Path "$env:USERPROFILE\Downloads\terraform.zip" -DestinationPath "C:\terraform" -Force
+
+# Add to PATH (current session)
+$env:PATH="C:\terraform;$env:PATH"
+```
+
+**Other Operating Systems:**
+
+Follow the official installation guide: https://developer.hashicorp.com/terraform/install
+
+**Verify Installation:**
+
+```powershell
+terraform -version
+```
+
+Expected output: `Terraform v1.11.4`
 
 ### Azure CLI
 
