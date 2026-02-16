@@ -103,3 +103,64 @@ The configuration provides the following outputs:
 ## Contact
 
 For issues or questions, contact: Engineering Team
+
+---
+
+## Technical Documentation
+
+<!-- BEGIN_TF_DOCS -->
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | 1.11.4 |
+| azurerm | ~> 4.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| azurerm | ~> 4.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| app_service | ./modules/app-service | n/a |
+| key_vault | ./modules/key-vault | n/a |
+| key_vault_access | ./modules/key-vault-access | n/a |
+| sql_database | ./modules/sql-database | n/a |
+| static_web_app | ./modules/static-web-app | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| azurerm_client_config.current | data source |
+| azurerm_resource_group.main | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| name | A unique name to assign to resources created by this module | `string` | n/a | yes |
+| env | The environment descriptor into which resources created by this module will be provisioned | `string` | `nonprod` | no |
+| location | Azure region for resources | `string` | `australiaeast` | no |
+| sql_admin_object_id | Microsoft Entra ID object ID for SQL admin | `string` | n/a | yes (sensitive) |
+| sql_admin_login | Microsoft Entra ID login name for SQL admin | `string` | n/a | yes |
+| deploy_static_web_app | Deploy Static Web App for SPA hosting | `bool` | `false` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| app_service_name | Name of the App Service |
+| app_service_default_hostname | Default hostname of the App Service |
+| app_service_principal_id | Principal ID of the App Service managed identity |
+| sql_server_fqdn | Fully qualified domain name of the SQL Server |
+| sql_database_name | Name of the SQL Database |
+| key_vault_uri | URI of the Key Vault |
+| static_web_app_default_hostname | Default hostname of the Static Web App |
+
+<!-- END_TF_DOCS -->
