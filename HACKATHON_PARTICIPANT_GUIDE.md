@@ -18,6 +18,114 @@ Today, you'll go from a blank canvas to a fully operational, cloud-native applic
 
 ---
 
+## GitHub Copilot Deep Dive — Your AI Toolkit
+
+Before we begin, let's understand the **GitHub Copilot features** you'll be mastering today. Each challenge deliberately introduces a different Copilot capability so that by the end of the day, you'll be a Copilot power user.
+
+### Built-in Agents (Chat Personas)
+
+GitHub Copilot in VS Code offers three built-in **agents** — each optimized for different workflows. You select an agent from the dropdown at the top of the Chat view:
+
+| Agent | Shortcut | What It Does | When to Use It |
+|-------|----------|--------------|----------------|
+| **Agent** | `Ctrl+Shift+I` | Autonomously plans, edits files, runs terminal commands, and invokes tools across your workspace | Building features, fixing bugs, scaffolding projects |
+| **Plan** | `/plan` | Creates a structured, step-by-step implementation plan *without* writing code. Hands off to Agent when approved | Complex tasks, architecture decisions, before major changes |
+| **Ask** | `Ctrl+Alt+I` | Answers questions about coding concepts, your codebase, or VS Code itself. Read-only — never modifies files | Learning, exploration, understanding unfamiliar code |
+
+> 💡 **Pro Tip:** Start with **Plan** to think through your approach, then hand off to **Agent** to implement it. This mirrors real-world software engineering: *design first, code second*.
+
+### Specification-Driven Development with Prompt Files
+
+One of the most powerful (and underused) Copilot features is **Prompt Files** (`.prompt.md`) — reusable, shareable specification files that encode *what* you want built. Think of them as a **spec kit** for AI-assisted development:
+
+- **What:** Markdown files with a `.prompt.md` extension stored in `.github/prompts/`
+- **Why:** Instead of typing the same long prompt repeatedly, you encode your specification once and invoke it with `/prompt-name` in chat
+- **How:** They support YAML frontmatter for configuring which agent, model, and tools to use, plus Markdown body with detailed instructions
+- **Bonus:** You can reference workspace files, use variables like `${selection}` and `${input:componentName}`, and share them with your team via Git
+
+**Example — A React Component Spec:**
+```markdown
+---
+description: Generate a React component from specification
+agent: agent
+tools: ['editFiles', 'runInTerminal', 'codebase']
+---
+
+Create a React functional component with TypeScript.
+
+Requirements:
+- Use React hooks (useState, useEffect) as needed
+- Include proper TypeScript interfaces for all props
+- Add JSDoc comments for the component and its props
+- Include error handling for any API calls
+- Follow the existing project patterns in [src/](../../src/lunch-vote-spa/src/)
+
+Component name: ${input:componentName}
+Component purpose: ${input:description}
+```
+
+You invoke it in chat by typing: `/react-component` — and Copilot builds it to your exact spec!
+
+### Custom Instructions (`.github/copilot-instructions.md`)
+
+Custom Instructions are **always-on** rules that shape how Copilot responds — across all chat interactions in your workspace. Unlike prompt files (which you invoke explicitly), custom instructions are automatically applied.
+
+Use them to encode your team's coding standards:
+```markdown
+## Code Standards
+- Use functional React components with hooks, never class components
+- All TypeScript interfaces must be exported from a types/ directory
+- Use kebab-case for file names, PascalCase for components
+- All API calls must include error handling with try/catch
+```
+
+### Custom Agents (`.agent.md`)
+
+Custom agents let you create **specialized AI personas** with their own tools, instructions, and even model preferences. They're defined as `.agent.md` files in `.github/agents/`:
+
+```markdown
+---
+description: Terraform infrastructure specialist
+tools: ['editFiles', 'runInTerminal', 'codebase', 'fetch']
+---
+
+You are a Terraform expert specializing in Azure infrastructure.
+Always follow HashiCorp best practices.
+Use modular Terraform structure with separate modules for each resource type.
+Always include variable validation rules.
+```
+
+Switch to your custom agent from the agent dropdown anytime!
+
+### Key Copilot Interactions at a Glance
+
+| Feature | How to Access | Purpose |
+|---------|---------------|----------|
+| **Inline Suggestions** | Just start typing | Auto-complete code as you type |
+| **Inline Chat** | `Ctrl+I` in editor | Quick edits without leaving your code |
+| **Chat View** | `Ctrl+Alt+I` | Full conversations with context |
+| **Quick Chat** | `Ctrl+Shift+Alt+L` | Fast question without switching views |
+| **`#` Context** | Type `#` in chat | Attach files, folders, tools, codebase |
+| **`@` Participants** | Type `@` in chat | `@workspace`, `@terminal`, `@vscode` |
+| **`/` Commands** | Type `/` in chat | `/fix`, `/tests`, `/explain`, `/doc`, `/plan` |
+| **Prompt Files** | `/prompt-name` | Run reusable specs |
+| **Custom Agents** | Agent dropdown | Switch to specialized personas |
+| **Vision** | Drag image into chat | Describe UI from screenshots/mockups |
+| **Code Review** | Source Control view | AI-powered review of uncommitted changes |
+
+### Copilot Features by Challenge
+
+| Challenge | Primary Copilot Feature Introduced |
+|-----------|--------------------------------------|
+| 1 — The Architect's Blueprint | **Agent mode** + **Custom Agents** for Terraform |
+| 2 — The Frontend Forge | **Prompt Files (Spec Kit)** + **Plan Agent** + **Vision** |
+| 3 — Liftoff! Deploy to the Cloud | **`@terminal`** participant + **Inline Chat** in terminal |
+| 4 — The Vault of Secrets | **Ask Agent** for learning + **`/explain`** command |
+| 5 — The Data Fortress | **Custom Instructions** + **`#codebase`** context |
+| 6 — Ship It Like a Pro | **Code Review** + **Commit Message Generation** |
+
+---
+
 ## 📋 Agenda
 
 | Time | Challenge | Title |
@@ -275,12 +383,48 @@ infra/
 | ✅ 11 | **Validation** | `terraform init` and `terraform validate` pass without errors |
 | ✅ 12 | **GitHub Copilot** | Demonstrate that GitHub Copilot assisted in writing the Terraform code (show chat history or inline suggestions) |
 
-### GitHub Copilot Tips for This Challenge
+### 🤖 GitHub Copilot Skill Focus: Agent Mode + Custom Agents
 
-- Start by asking Copilot: *"Help me create a Terraform module for an Azure Linux App Service with managed identity and .NET 8 runtime"*
-- Ask follow-up questions about specific properties you're unsure about
-- Use Copilot to generate variable definitions with validation rules
-- Ask Copilot to explain any Terraform concepts you don't understand
+This challenge introduces **Agent mode** and **Custom Agents** — the most powerful way to use Copilot for code generation.
+
+#### Step-by-Step: Create a Terraform Custom Agent
+
+1. In VS Code, open the Chat view (`Ctrl+Alt+I`)
+2. Click the agent dropdown (top of Chat) → **Configure Custom Agents** → **Create new custom agent**
+3. Choose **Workspace** and name it `terraform-architect`
+4. Paste this into your `.github/agents/terraform-architect.agent.md`:
+
+```markdown
+---
+description: Azure Terraform infrastructure specialist
+tools: ['editFiles', 'runInTerminal', 'codebase', 'fetch', 'search']
+---
+
+You are an expert Terraform engineer specializing in Azure cloud infrastructure.
+
+## Rules
+- Always use modular Terraform structure with separate modules per resource type
+- Use azurerm provider ~> 3.0
+- Include variable validation rules for environment (dev/stg/prod)
+- Enable managed identity (SystemAssigned) on all App Services
+- Use RBAC authorization for Key Vault (never access policies)
+- Configure HTTPS-only, TLS 1.2+, and FTPS disabled on all web apps
+- Include meaningful outputs for all resource names, hostnames, and URLs
+- Add random suffixes to globally unique resource names
+```
+
+5. Switch to your **terraform-architect** agent from the dropdown
+6. Now ask: *"Create a Terraform module for an Azure Linux App Service with managed identity and .NET 8 runtime"*
+
+> Notice how the custom agent gives more targeted, consistent results than a generic prompt!
+
+#### Additional Copilot Techniques
+
+- **Agent mode (`Ctrl+Shift+I`)**: Let Copilot create files, run `terraform validate`, and fix issues autonomously
+- **Ask mode**: Switch to **Ask** agent to learn: *"Explain the difference between azurerm_role_assignment and azurerm_key_vault_access_policy"*
+- **Inline suggestions**: Open a `.tf` file and start typing `resource "azurerm_` — watch Copilot auto-complete the resource block
+- **`@terminal`**: In chat, ask `@terminal how do I initialize Terraform in my infra directory?`
+- **`/explain`**: Select a Terraform block and use `/explain` to understand what it does
 
 ---
 
@@ -324,6 +468,115 @@ Using GitHub Copilot, create a React + TypeScript SPA that integrates with the p
 3. **Create Poll Screen**  Create a new poll when no active poll exists for a group
 4. **Results Screen**  View vote counts and percentages as a bar chart or visual display
 
+### 🤖 GitHub Copilot Skill Focus: Specification-Driven Development with Prompt Files (Spec Kit)
+
+This challenge introduces **Prompt Files** — your personal **spec kit** for driving Copilot with reusable, structured specifications. Instead of typing ad-hoc prompts, you'll write specifications that encode exactly what you want built.
+
+#### Step-by-Step: Build Your Spec Kit
+
+**1. Create the prompts directory:**
+```powershell
+mkdir -p .github/prompts
+```
+
+**2. Create a project scaffold spec** — `.github/prompts/scaffold-react-app.prompt.md`:
+```markdown
+---
+description: Scaffold a React + TypeScript SPA with Vite
+agent: agent
+tools: ['editFiles', 'runInTerminal', 'createFile', 'listDirectory']
+---
+
+Scaffold a new React + TypeScript project using Vite in `src/lunch-vote-spa/`.
+
+## Requirements
+- Use React 18+ with TypeScript 5+
+- Install react-router-dom for client-side routing
+- Configure Vite proxy to forward /api requests to https://localhost:52544
+- Create the following route structure:
+  - `/` → Home screen
+  - `/group/:groupId` → Vote screen
+  - `/group/:groupId/create` → Create poll screen
+  - `/poll/:pollId/results` → Results screen
+
+## Project Structure
+```
+src/lunch-vote-spa/
+├── src/
+│   ├── App.tsx           # Router setup
+│   ├── main.tsx          # Entry point
+│   ├── components/       # React components (one per screen)
+│   ├── services/         # API service layer
+│   └── types/            # TypeScript interfaces
+└── package.json
+```
+```
+
+**3. Create a component generation spec** — `.github/prompts/react-component.prompt.md`:
+```markdown
+---
+description: Generate a React component from specification
+agent: agent
+tools: ['editFiles', 'codebase', 'readFile']
+---
+
+Create a React functional component with TypeScript for the Lunch Vote App.
+
+## Component Specification
+- **Name:** ${input:componentName}
+- **Purpose:** ${input:description}
+
+## Standards
+- Use React hooks (useState, useEffect, useCallback) as needed
+- Define TypeScript interfaces for all props
+- Include loading states and error handling
+- Add JSDoc comments
+- Use CSS modules or a separate .css file for styling
+- Follow existing patterns from the project's components/ directory
+```
+
+**4. Create an API service spec** — `.github/prompts/api-service.prompt.md`:
+```markdown
+---
+description: Generate the API service layer for Lunch Vote App
+agent: agent
+tools: ['editFiles', 'codebase']
+---
+
+Generate a TypeScript API service layer in `src/lunch-vote-spa/src/services/api.ts`.
+
+## API Endpoints to integrate:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST   | /api/polls | Create a new poll |
+| GET    | /api/polls/active?groupId={groupId} | Get active poll |
+| GET    | /api/polls/{pollId}/results | Get poll results |
+| POST   | /api/votes | Submit a vote |
+| GET    | /api/groups | Get all group IDs |
+
+## Requirements:
+- Use the Fetch API (no axios)
+- Base URL from `import.meta.env.VITE_API_URL` with fallback to '/api'
+- Create a custom `ApiRequestError` class with error code, message, and status
+- All functions should be async and properly typed with return types
+- Include a generic `handleResponse<T>` helper for error handling
+```
+
+**5. Use your spec kit in Chat:**
+- Type `/scaffold-react-app` in chat to scaffold the entire project
+- Type `/react-component` to generate individual components (it will prompt you for name and description)
+- Type `/api-service` to generate the complete API layer
+
+> 🎯 **Why Spec Kit?** Prompt files turn one-off prompts into **repeatable, shareable specifications**. Your team can commit these to Git, iterate on them, and ensure consistent, high-quality AI output. This is the foundation of **specification-driven development**.
+
+#### Additional Copilot Techniques for Frontend Development
+
+- **Plan agent first**: Start with the **Plan** agent: *"Plan the component architecture for a voting SPA with 4 screens"*. Review the plan, then click **Start Implementation** to hand off to Agent mode
+- **Vision (image context)**: Have a UI mockup or wireframe? Drag the image into the Chat view and ask: *"Build this screen as a React component"*
+- **Inline Chat (`Ctrl+I`)**: Select a component in the editor and press `Ctrl+I` to ask for modifications: *"Add loading spinner and error state to this component"*
+- **`/tests`**: Select a component or service file, then type `/tests` to auto-generate unit tests
+- **Context with `#`**: Type `#types/index.ts` in chat to reference your TypeScript interfaces when asking Copilot to build components that use them
+
 ### Acceptance Criteria
 
 | # | Criteria | Details |
@@ -343,11 +596,13 @@ Using GitHub Copilot, create a React + TypeScript SPA that integrates with the p
 
 ### GitHub Copilot Tips for This Challenge
 
-- Start by asking Copilot: *"Scaffold a React + TypeScript project with Vite and React Router for a voting application"*
-- Share the API endpoint table with Copilot and ask it to generate the API service layer
-- Describe each screen's layout and functionality to Copilot and let it generate components
-- Ask Copilot to help with CSS styling for a clean, modern look
-- Use Copilot to generate the voter token utility function
+- Use your **Prompt Files (spec kit)** to scaffold the project, generate the API service layer, and create components consistently
+- Start with the **Plan** agent to design the component architecture before implementing
+- Use **Vision** by dragging mockup/wireframe images into chat for UI generation
+- Use **Inline Chat** (`Ctrl+I`) to refine individual components after generation
+- Ask Copilot to help with CSS styling: *"Style this component with a modern card-based layout using CSS flexbox"*
+- Use `/tests` on your service layer to generate unit tests
+- Use `#codebase` in your prompts so Copilot understands your project structure
 
 ---
 
@@ -389,6 +644,33 @@ When your frontend (running on one domain) makes API calls to your backend (on a
 ### Your Mission
 
 Provision your Terraform infrastructure to Azure and deploy both the API and SPA to their respective App Services.
+
+### 🤖 GitHub Copilot Skill Focus: `@terminal` Participant + Inline Terminal Chat
+
+This challenge is all about command-line work — and Copilot shines here too!
+
+#### `@terminal` — Your Command-Line Guide
+
+Instead of Googling Azure CLI syntax, ask Copilot directly in chat:
+- `@terminal How do I deploy a zip file to Azure App Service?`
+- `@terminal What's the command to list all resources in my resource group?`
+- `@terminal Explain what az webapp deploy --type zip does`
+
+#### Inline Chat in the Terminal
+
+Press `Ctrl+I` while your cursor is in the **integrated terminal** to open Inline Chat. Describe what you want in natural language — Copilot generates the command:
+- *"Publish my .NET app to a folder called publish"*  → `dotnet publish -c Release -o ./publish`
+- *"Zip all files in the publish folder"* → `Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force`
+- *"Show me the terraform outputs"* → `terraform output`
+
+#### Error Troubleshooting
+
+When a command fails:
+1. Select the error text in the terminal
+2. Right-click → **Copilot: Explain This**
+3. Or use `@terminal /explain` with the error message in chat
+
+> 💡 **Pro Tip:** After a failed command, you can click the sparkle icon ✨ next to the terminal error to have Copilot suggest a fix automatically.
 
 ### Acceptance Criteria
 
@@ -485,6 +767,30 @@ Instead of legacy access policies, modern Key Vault uses **RBAC** to control who
 
 Configure your deployed Azure infrastructure so the backend App Service can securely access secrets from Key Vault using its Managed Identity  with zero passwords in your codebase.
 
+### 🤖 GitHub Copilot Skill Focus: Ask Agent + `/explain` for Deep Learning
+
+Security concepts like Managed Identity, RBAC, and Key Vault can be complex. This challenge is designed for **learning** — and the **Ask** agent is your teacher.
+
+#### Using Ask Agent to Learn
+
+Switch to the **Ask** agent from the dropdown (it never modifies files — safe for exploration):
+
+- *"Explain how Azure Managed Identity works at a technical level. How does the token exchange happen?"*
+- *"What's the difference between System-Assigned and User-Assigned Managed Identity?"*
+- *"Why is RBAC preferred over Key Vault access policies?"*
+- *"What happens when my App Service tries to access Key Vault — walk me through the authentication flow"*
+
+#### `/explain` on Terraform Code
+
+Select your Key Vault Terraform module and use `/explain` to understand each property:
+- What does `enable_rbac_authorization = true` do?
+- What is `soft_delete_retention_days` and why does it matter?
+- What does the `role_definition_name = "Key Vault Secrets User"` role allow?
+
+#### Multi-Model Exploration
+
+Try asking the same question to **different AI models** using the model picker (click the model name at the bottom of chat). Compare how Claude, GPT, and other models explain Managed Identity differently — you'll get richer understanding from multiple perspectives!
+
 ### Acceptance Criteria
 
 | # | Criteria | Details |
@@ -570,6 +876,43 @@ Server=tcp:<server>.database.windows.net,1433;Database=sqldb-lunchvote;Authentic
 
 Wire up your deployed backend API to the Azure SQL Database provisioned by Terraform, using Managed Identity for passwordless authentication.
 
+### 🤖 GitHub Copilot Skill Focus: Custom Instructions + `#codebase` Context
+
+This challenge introduces **Custom Instructions** — always-on rules that shape every Copilot response in your workspace.
+
+#### Step-by-Step: Create Custom Instructions
+
+1. Create the file `.github/copilot-instructions.md` in your workspace root
+2. Add rules that apply globally to all Copilot interactions:
+
+```markdown
+## Project Context
+This is the Lunch Vote App — a team-based lunch voting application.
+- Backend: .NET 10 Web API with Entity Framework Core
+- Frontend: React + TypeScript SPA with Vite
+- Database: Azure SQL Database with Entra ID authentication
+- Infrastructure: Terraform with modular structure
+
+## Coding Standards
+- Always use `Authentication=Active Directory Default` for SQL connections (never SQL auth)
+- Use System-Assigned Managed Identity for all Azure service-to-service auth
+- Never hardcode secrets, connection strings, or passwords in code
+- Use RBAC instead of access policies for Key Vault
+- All Terraform resources should follow naming convention: {type}-lunchvote-{environment}
+```
+
+Now every Copilot response will respect these rules automatically!
+
+#### Using `#codebase` for Project-Aware Responses
+
+When asking Copilot about database connectivity, use `#codebase` to give it full project context:
+
+- *"#codebase How is the database connection configured in this project? What connection string format does it use?"*
+- *"#codebase Show me how EF Core is configured and what entities exist"*
+- *"#codebase What changes would I need to make to switch from in-memory to Azure SQL?"*
+
+The `#codebase` keyword triggers a semantic search across your entire workspace, giving Copilot rich understanding of your project's patterns.
+
 ### Acceptance Criteria
 
 | # | Criteria | Details |
@@ -643,6 +986,38 @@ Beyond deployment, you'll explore:
 ### Your Mission
 
 Upgrade your App Service to support deployment slots, implement a blue/green deployment workflow, and demonstrate zero-downtime releases.
+
+### 🤖 GitHub Copilot Skill Focus: Code Review + Commit Message Generation
+
+For the final challenge, you'll use Copilot as a **code reviewer** and **DevOps assistant** — the capstone of your Copilot journey.
+
+#### AI-Powered Code Review
+
+Before committing your Terraform changes for deployment slots:
+
+1. Open the **Source Control** view (`Ctrl+Shift+G`)
+2. Click the **Code Review** button (sparkle icon) to review all uncommitted changes
+3. Copilot will add inline review comments highlighting potential issues, security concerns, and improvement suggestions
+4. Alternatively, select a block of changed code → right-click → **Generate Code** → **Review**
+
+#### Smart Commit Messages
+
+Instead of writing vague commit messages like "updated stuff":
+1. Stage your changes in Source Control
+2. Click the **sparkle icon ✨** next to the commit message input box
+3. Copilot analyzes your diff and generates a descriptive commit message like: *"feat: add staging deployment slot with warm-up config and S1 SKU upgrade"*
+
+#### Using `#changes` in Chat
+
+Reference your current uncommitted changes in chat:
+- *"#changes Review my Terraform changes for the deployment slot and suggest any security improvements"*
+- *"#changes Summarize what I changed and help me write release notes"*
+
+#### Quick Chat for DevOps Questions
+
+Use **Quick Chat** (`Ctrl+Shift+Alt+L`) for fast questions without leaving your current workflow:
+- *"What's the difference between slot swap and slot swap with preview?"*
+- *"How does App Service warm-up work during a slot swap?"*
 
 ### Acceptance Criteria
 
@@ -739,17 +1114,44 @@ az group delete --name rg-lunchvote-dev --yes --no-wait
 
 ---
 
-## 💡 General GitHub Copilot Tips
+## 💡 GitHub Copilot Mastery Guide
+
+### Prompting Techniques
 
 | Technique | Example |
-|-----------|---------|
+|-----------|----------|
 | **Be specific** | *"Create a Terraform module for Azure Linux Web App with .NET 8 runtime, B1 SKU, managed identity, HTTPS-only"* |
 | **Provide context** | Paste API endpoint tables, type definitions, or error messages into the chat |
 | **Iterate** | If the first response isn't right, refine: *"Update this to use RBAC instead of access policies"* |
 | **Ask to explain** | *"Explain what `azuread_authentication_only = true` does on an Azure SQL Server"* |
 | **Debug together** | Paste error messages and ask: *"I'm getting this error when running terraform apply  what's wrong?"* |
 | **Use inline suggestions** | Start typing a line of code and let Copilot auto-complete the rest |
-| **Use @workspace** | Ask Copilot about your codebase: *"@workspace What API endpoints does the backend expose?"* |
+| **Use `@workspace`** | Ask Copilot about your codebase: *"@workspace What API endpoints does the backend expose?"* |
+| **Use `#codebase`** | *"#codebase Find all places where the connection string is configured"* |
+| **Use `@terminal`** | *"@terminal How do I check if my Terraform state is up to date?"* |
+| **Multi-turn conversations** | Ask follow-up questions — Copilot remembers the full conversation context |
+
+### Keyboard Shortcuts Cheat Sheet
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+Alt+I` | Open Chat view |
+| `Ctrl+Shift+I` | Switch to Agent mode |
+| `Ctrl+I` | Inline Chat (editor or terminal) |
+| `Ctrl+Shift+Alt+L` | Quick Chat |
+| `Tab` | Accept inline suggestion |
+| `Escape` | Dismiss inline suggestion |
+| `Ctrl+Alt+.` | Open model picker |
+| `Ctrl+N` | New chat session |
+
+### Copilot Features Quick Reference
+
+| Feature | File/Location | Purpose |
+|---------|---------------|---------|
+| **Custom Instructions** | `.github/copilot-instructions.md` | Always-on coding standards |
+| **Prompt Files (Spec Kit)** | `.github/prompts/*.prompt.md` | Reusable task specifications |
+| **Custom Agents** | `.github/agents/*.agent.md` | Specialized AI personas |
+| **Path-Specific Instructions** | `.github/instructions/*.instructions.md` | Rules for specific file types |
 
 ---
 
