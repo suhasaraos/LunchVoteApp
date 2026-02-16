@@ -1,0 +1,19 @@
+# Terraform Variables Example
+# Copy this file to terraform.tfvars and update with your values
+
+# Environment (dev, stg, prod)
+environment = "dev"
+
+# Azure region for all resources
+location = "australiaeast"
+
+# SQL Admin Configuration
+# Get your Object ID: az ad signed-in-user show --query id -o tsv
+sql_admin_object_id = "your-entra-id-object-id-here"
+
+# Get your email: az ad signed-in-user show --query userPrincipalName -o tsv
+sql_admin_login = "your-email@domain.com"
+
+# Deploy Static Web App (alternative to Frontend App Service)
+# Set to true only if you want Static Web App instead of App Service for frontend
+deploy_static_web_app = false

@@ -1,6 +1,12 @@
 # App Service Module
 # Creates App Service Plan and App Service for the .NET 10 API
 
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 resource "azurerm_service_plan" "main" {
   name                = var.app_service_plan_name
   location            = var.location
@@ -10,7 +16,7 @@ resource "azurerm_service_plan" "main" {
 }
 
 resource "azurerm_linux_web_app" "main" {
-  name                = var.app_service_name
+  name                = "app-lunchvote-api-${var.environment}-${random_string.suffix.result}"
   location            = var.location
   resource_group_name = var.resource_group_name
   service_plan_id     = azurerm_service_plan.main.id
@@ -31,11 +37,12 @@ resource "azurerm_linux_web_app" "main" {
     }
 
     cors {
-      allowed_origins = [
+      allowed_origins = compact([
         "http://localhost:5173",
         "http://localhost:3000",
-        "https://*.azurestaticapps.net"
-      ]
+        "https://*.azurestaticapps.net",
+        var.frontend_url
+      ])
       support_credentials = false
     }
   }

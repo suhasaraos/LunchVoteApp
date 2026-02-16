@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -50,7 +54,7 @@ module "key_vault" {
   tenant_id           = data.azurerm_client_config.current.tenant_id
 }
 
-# App Service Module
+# API App Service Module
 module "app_service" {
   source = "./modules/app-service"
   location               = azurerm_resource_group.main.location
@@ -63,6 +67,16 @@ module "app_service" {
   environment            = var.environment
 }
 
+# Frontend App Service Module
+module "frontend_app_service" {
+  source = "./modules/frontend-app-service"
+  location               = azurerm_resource_group.main.location
+  resource_group_name    = azurerm_resource_group.main.name
+  app_service_plan_name  = "plan-lunchvote-spa-${var.environment}"
+  api_base_url           = "https://${module.app_service.default_hostname}"
+  environment            = var.environment
+}
+
 # Key Vault Access Module
 module "key_vault_access" {
   source = "./modules/key-vault-access"
@@ -70,7 +84,7 @@ module "key_vault_access" {
   principal_id = module.app_service.principal_id
 }
 
-# Static Web App Module (optional)
+# Static Web App Module (optional - only if not using App Service for frontend)
 module "static_web_app" {
   count  = var.deploy_static_web_app ? 1 : 0
   source = "./modules/static-web-app"

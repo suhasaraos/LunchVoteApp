@@ -37,3 +37,9 @@ variable "environment" {
   description = "Environment suffix"
   type        = string
 }
+
+variable "frontend_url" {
+  description = "Frontend application URL for CORS configuration"
+  type        = string
+  default     = ""
+}
