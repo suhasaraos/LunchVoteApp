@@ -109,7 +109,11 @@ Invoke-WebRequest -Uri "https://releases.hashicorp.com/terraform/1.11.4/terrafor
 Expand-Archive -Path "$env:USERPROFILE\Downloads\terraform.zip" -DestinationPath "C:\terraform" -Force
 
 # Add to PATH (current session)
+# PowerShell:
 $env:PATH="C:\terraform;$env:PATH"
+
+# CMD:
+# set PATH=C:\terraform;%PATH%
 ```
 
 **Other Operating Systems:**
