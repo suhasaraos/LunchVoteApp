@@ -248,10 +248,10 @@ cd infra/terraform
 terraform init
 
 # Review the deployment plan
-terraform plan -var="sql_admin_object_id=$OBJECT_ID" -var="sql_admin_login=$EMAIL"
+terraform plan -out tfplan -var="sql_admin_object_id=$OBJECT_ID" -var="sql_admin_login=$EMAIL"
 
 # Deploy infrastructure
-terraform apply -var="sql_admin_object_id=$OBJECT_ID" -var="sql_admin_login=$EMAIL"
+terraform apply tfplan
 
 # View outputs
 terraform output
