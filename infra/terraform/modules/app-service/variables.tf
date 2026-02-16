@@ -33,7 +33,7 @@ variable "key_vault_uri" {
   type        = string
 }
 
-variable "environment" {
-  description = "Environment suffix"
+variable "env" {
+  description = "Environment descriptor"
   type        = string
 }

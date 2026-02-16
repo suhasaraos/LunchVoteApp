@@ -21,11 +21,11 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   site_config {
-    always_on         = true
-    ftps_state        = "Disabled"
+    always_on           = true
+    ftps_state          = "Disabled"
+    http2_enabled       = true
     minimum_tls_version = "1.2"
-    http2_enabled     = true
-    
+
     application_stack {
       dotnet_version = "8.0"
     }
@@ -41,7 +41,7 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   app_settings = {
-    "ASPNETCORE_ENVIRONMENT" = var.environment == "prod" ? "Production" : "Development"
+    "ASPNETCORE_ENVIRONMENT" = var.env == "prod" ? "Production" : "Development"
     "KeyVaultUri"            = var.key_vault_uri
   }
 

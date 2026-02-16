@@ -2,34 +2,28 @@
 # Creates Azure SQL Server and Database with Microsoft Entra-only authentication
 
 resource "azurerm_mssql_server" "main" {
-  name                         = var.sql_server_name
-  location                     = var.location
-  resource_group_name          = var.resource_group_name
-  version                      = "12.0"
-  minimum_tls_version          = "1.2"
+  name                          = var.sql_server_name
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
+  version                       = "12.0"
+  minimum_tls_version           = "1.2"
   public_network_access_enabled = true
 
   azuread_administrator {
+    azuread_authentication_only = true
     login_username              = var.sql_admin_login
     object_id                   = var.sql_admin_object_id
-    azuread_authentication_only = true
   }
 }
 
 resource "azurerm_mssql_database" "main" {
-  name         = var.sql_database_name
-  server_id    = azurerm_mssql_server.main.id
-  collation    = "SQL_Latin1_General_CP1_CI_AS"
-  max_size_gb  = 2
-  sku_name     = "Basic"
-  zone_redundant = false
-  
-  # Basic tier settings
+  name           = var.sql_database_name
+  server_id      = azurerm_mssql_server.main.id
+  collation      = "SQL_Latin1_General_CP1_CI_AS"
+  max_size_gb    = 2
   read_scale     = false
-  
-  tags = {
-    Environment = "Hackathon"
-  }
+  sku_name       = "Basic"
+  zone_redundant = false
 }
 
 # Firewall rule to allow Azure services
