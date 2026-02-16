@@ -13,6 +13,7 @@ resource "azurerm_mssql_server" "main" {
   resource_group_name           = var.resource_group_name
   version                       = "12.0"
   minimum_tls_version           = "1.2"
+  # Public access enabled for nonprod development convenience; use Private Endpoints in prod
   public_network_access_enabled = true
 
   azuread_administrator {

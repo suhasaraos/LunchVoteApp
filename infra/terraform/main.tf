@@ -13,7 +13,6 @@ resource "azurerm_resource_group" "main" {
 # SQL Database Module
 module "sql_database" {
   source = "./modules/sql-database"
-
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   sql_server_name     = "sql-${var.name}-${var.env}"
@@ -56,9 +55,8 @@ module "key_vault_access" {
 
 # Static Web App Module (optional)
 module "static_web_app" {
-  count  = var.deploy_static_web_app ? 1 : 0
   source = "./modules/static-web-app"
-
+  count  = var.deploy_static_web_app ? 1 : 0
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   static_web_app_name = "stapp-${var.name}-${var.env}"
