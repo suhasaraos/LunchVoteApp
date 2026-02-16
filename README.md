@@ -238,8 +238,8 @@ az deployment group create \
 az login
 
 # Get your credentials
-OBJECT_ID=$(az ad signed-in-user show --query id -o tsv)
-EMAIL=$(az ad signed-in-user show --query userPrincipalName -o tsv)
+$OBJECT_ID = az ad signed-in-user show --query id -o tsv
+$EMAIL = az ad signed-in-user show --query userPrincipalName -o tsv
 
 # Navigate to terraform directory
 cd infra/terraform
@@ -248,14 +248,10 @@ cd infra/terraform
 terraform init
 
 # Review the deployment plan
-terraform plan \
-  -var="sql_admin_object_id=$OBJECT_ID" \
-  -var="sql_admin_login=$EMAIL"
+terraform plan -var="sql_admin_object_id=$OBJECT_ID" -var="sql_admin_login=$EMAIL"
 
 # Deploy infrastructure
-terraform apply \
-  -var="sql_admin_object_id=$OBJECT_ID" \
-  -var="sql_admin_login=$EMAIL"
+terraform apply -var="sql_admin_object_id=$OBJECT_ID" -var="sql_admin_login=$EMAIL"
 
 # View outputs
 terraform output
