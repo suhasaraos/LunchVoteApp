@@ -8,7 +8,7 @@ resource "random_string" "suffix" {
 }
 
 resource "azurerm_service_plan" "frontend" {
-  name                = var.app_service_plan_name
+  name                = "${var.app_service_plan_name}-${random_string.suffix.result}"
   location            = var.location
   resource_group_name = var.resource_group_name
   os_type             = "Linux"
