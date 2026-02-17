@@ -25,7 +25,6 @@ module "sql_database" {
 # Key Vault Module
 module "key_vault" {
   source = "./modules/key-vault"
-
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   key_vault_name      = "kv-${var.name}-${var.env}"
@@ -45,10 +44,19 @@ module "app_service" {
   env                   = var.env
 }
 
+# Frontend App Service Module
+module "frontend_app_service" {
+  source = "./modules/frontend-app-service"
+  location              = azurerm_resource_group.main.location
+  resource_group_name   = azurerm_resource_group.main.name
+  app_service_plan_name = "plan-${var.name}-frontend-${var.env}"
+  api_base_url          = "https://${module.app_service.default_hostname}"
+  environment           = var.env
+}
+
 # Key Vault Access Module
 module "key_vault_access" {
   source = "./modules/key-vault-access"
-
   key_vault_id = module.key_vault.key_vault_id
   principal_id = module.app_service.principal_id
 }
