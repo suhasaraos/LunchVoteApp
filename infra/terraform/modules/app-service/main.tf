@@ -6,9 +6,8 @@ resource "random_string" "suffix" {
   special = false
   upper   = false
 }
-
 resource "azurerm_service_plan" "main" {
-  name                = var.app_service_plan_name
+  name                = "${var.app_service_plan_name}-${random_string.suffix.result}"
   location            = var.location
   resource_group_name = var.resource_group_name
   os_type             = "Linux"
@@ -27,11 +26,11 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   site_config {
-    always_on         = true
-    ftps_state        = "Disabled"
+    always_on           = true
+    ftps_state          = "Disabled"
+    http2_enabled       = true
     minimum_tls_version = "1.2"
-    http2_enabled     = true
-    
+
     application_stack {
       dotnet_version = "8.0"
     }
@@ -48,7 +47,7 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   app_settings = {
-    "ASPNETCORE_ENVIRONMENT" = var.environment == "prod" ? "Production" : "Development"
+    "ASPNETCORE_ENVIRONMENT" = var.env == "prod" ? "Production" : "Development"
     "KeyVaultUri"            = var.key_vault_uri
   }
 

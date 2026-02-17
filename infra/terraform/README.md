@@ -19,7 +19,7 @@ terraform/
 
 ## Prerequisites
 
-1. [Terraform](https://www.terraform.io/downloads) >= 1.0
+1. [Terraform 1.11.4](https://www.terraform.io/downloads)
 2. [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
 3. Azure subscription
 
@@ -161,7 +161,6 @@ This Terraform configuration deploys a **dual App Service architecture**:
 
 ## Notes
 
-- Resource Group is created automatically as `rg-lunchvote-{environment}`
 - All resources use passwordless authentication with Microsoft Entra ID
 - Key Vault uses RBAC authorization (not access policies)
 - Static Web App is optional and controlled by `deploy_static_web_app` variable

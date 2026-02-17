@@ -1,10 +1,15 @@
-variable "environment" {
-  description = "Environment suffix (dev, stg, prod)"
+variable "name" {
+  description = "A unique name to assign to resources created by this module"
   type        = string
-  default     = "dev"
+}
+
+variable "env" {
+  description = "The environment descriptor into which resources created by this module will be provisioned"
+  type        = string
+  default     = "nonprod"
   validation {
-    condition     = contains(["dev", "stg", "prod"], var.environment)
-    error_message = "Environment must be dev, stg, or prod."
+    condition     = contains(["nonprod", "prod", "sandpit"], var.env)
+    error_message = "The env value must be one of 'nonprod', 'prod', or 'sandpit'"
   }
 }
 
@@ -17,6 +22,7 @@ variable "location" {
 variable "sql_admin_object_id" {
   description = "Microsoft Entra ID object ID for SQL admin"
   type        = string
+  sensitive   = true
 }
 
 variable "sql_admin_login" {
