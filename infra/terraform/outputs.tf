@@ -1,16 +1,41 @@
 output "app_service_name" {
-  description = "Name of the App Service"
+  description = "Name of the API App Service"
   value       = module.app_service.app_service_name
 }
 
 output "app_service_default_hostname" {
-  description = "Default hostname of the App Service"
+  description = "Default hostname of the API App Service"
   value       = module.app_service.default_hostname
 }
 
+output "api_url" {
+  description = "Full HTTPS URL of the API"
+  value       = "https://${module.app_service.default_hostname}"
+}
+
 output "app_service_principal_id" {
-  description = "Principal ID of the App Service managed identity"
+  description = "Principal ID of the API App Service managed identity"
   value       = module.app_service.principal_id
+}
+
+output "frontend_app_service_name" {
+  description = "Name of the Frontend App Service"
+  value       = module.frontend_app_service.app_service_name
+}
+
+output "frontend_app_service_default_hostname" {
+  description = "Default hostname of the Frontend App Service"
+  value       = module.frontend_app_service.default_hostname
+}
+
+output "frontend_url" {
+  description = "Full HTTPS URL of the Frontend"
+  value       = module.frontend_app_service.url
+}
+
+output "frontend_app_service_principal_id" {
+  description = "Principal ID of the Frontend App Service managed identity"
+  value       = module.frontend_app_service.principal_id
 }
 
 output "sql_server_fqdn" {

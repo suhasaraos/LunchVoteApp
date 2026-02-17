@@ -37,3 +37,9 @@ variable "env" {
   description = "Environment descriptor"
   type        = string
 }
+
+variable "frontend_url" {
+  description = "Frontend application URL for CORS configuration"
+  type        = string
+  default     = ""
+}

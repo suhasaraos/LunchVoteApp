@@ -30,10 +30,9 @@ LunchVoteApp/
 - TypeScript 5+
 
 ### Infrastructure
-- Azure App Service
+- Azure App Service (Backend API + Frontend SPA)
 - Azure SQL Database
 - Azure Key Vault
-- Azure Static Web Apps (optional)
 
 ## Prerequisites
 
@@ -93,9 +92,40 @@ Move-Item "$env:USERPROFILE\.nodejs\node-v20.11.1-win-x64\*" "$env:USERPROFILE\.
 $env:PATH="$env:USERPROFILE\.nodejs;$env:PATH"
 ```
 
-### Terraform Version
+### Terraform Installation
 
-This project uses **Terraform v1.11.4**. Ensure you have this version or higher installed.
+This project uses **Terraform v1.11.4**.
+
+**Windows Installation:**
+
+Download and install Terraform v1.11.4:
+
+```powershell
+# Download Terraform for Windows
+Invoke-WebRequest -Uri "https://releases.hashicorp.com/terraform/1.11.4/terraform_1.11.4_windows_amd64.zip" -OutFile "$env:USERPROFILE\Downloads\terraform.zip"
+
+# Extract to a local directory (e.g., C:\terraform)
+Expand-Archive -Path "$env:USERPROFILE\Downloads\terraform.zip" -DestinationPath "C:\terraform" -Force
+
+# Add to PATH (current session)
+# PowerShell:
+$env:PATH="C:\terraform;$env:PATH"
+
+# CMD:
+# set PATH=C:\terraform;%PATH%
+```
+
+**Other Operating Systems:**
+
+Follow the official installation guide: https://developer.hashicorp.com/terraform/install
+
+**Verify Installation:**
+
+```powershell
+terraform -version
+```
+
+Expected output: `Terraform v1.11.4`
 
 ### Azure CLI
 
@@ -107,13 +137,7 @@ az version
 
 ### Important Notes
 
-- **Application Insights**: Application Insights is disabled due to Suncorp Azure policy restrictions. The deployment will fail if you attempt to provision Application Insights resources.
-  
-  Policy error reference:
-  ```
-  Resource was disallowed by policy: 'Deny Usage of Application Insights'
-  Policy Assignment: 'Suncorp Azure MSB (Misc)'
-  ```
+- **Resource Naming**: Terraform resources include a random 6-character suffix to ensure global uniqueness (e.g., `app-lunchvote-api-dev-a1b2c3`).
 
 ## Local Development
 
@@ -132,7 +156,9 @@ cd src/LunchVoteApi
 dotnet run
 ```
 
-The API will be available at `http://localhost:5000`
+The API will be available at:
+- `https://localhost:52544` (HTTPS)
+- `http://localhost:52545` (HTTP)
 
 ### Start Frontend
 
@@ -152,6 +178,7 @@ The SPA will be available at `http://localhost:5173`
 | GET | `/api/polls/active?groupId={groupId}` | Get active poll for a group |
 | GET | `/api/polls/{pollId}/results` | Get poll results |
 | POST | `/api/votes` | Submit a vote |
+| GET | `/api/groups` | Get all group IDs with active polls |
 
 ## Testing
 
@@ -160,13 +187,6 @@ The SPA will be available at `http://localhost:5173`
 ```bash
 cd tests/LunchVoteApi.Tests
 dotnet test
-```
-
-### Frontend Tests
-
-```bash
-cd src/lunch-vote-spa
-npm test
 ```
 
 ## Deployment
@@ -198,6 +218,18 @@ az deployment group create \
   --parameters infra/bicep/parameters.dev.json
 ```
 
+#### Bicep Resources Created
+
+- Resource Group: `rg-lunchvote-dev`
+- Backend App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
+- Backend App Service: `app-lunchvote-api-dev` (.NET 10.0)
+- Frontend App Service Plan: `plan-lunchvote-spa-dev` (Linux, B1 SKU)
+- Frontend App Service: `app-lunchvote-spa-dev` (Node.js 20 LTS)
+- SQL Server: `sql-lunchvote-dev` (Entra ID auth only)
+- SQL Database: `sqldb-lunchvote` (Basic tier, 2GB)
+- Key Vault: `kv-lunchvote-dev` (RBAC enabled)
+- Static Web App: `stapp-lunchvote-dev` (optional, disabled by default)
+
 ### Option 2: Deploy with Terraform
 
 #### Deploy Infrastructure
@@ -206,20 +238,21 @@ az deployment group create \
 # Login to Azure
 az login
 
+# Get your credentials
+$OBJECT_ID = az ad signed-in-user show --query id -o tsv
+$EMAIL = az ad signed-in-user show --query userPrincipalName -o tsv
+
 # Navigate to terraform directory
 cd infra/terraform
-
-# Edit variables (update SQL admin credentials)
-code terraform.tfvars
 
 # Initialize Terraform
 terraform init
 
 # Review the deployment plan
-terraform plan
+terraform plan -out tfplan -var="sql_admin_object_id=$OBJECT_ID" -var="sql_admin_login=$EMAIL"
 
 # Deploy infrastructure
-terraform apply
+terraform apply tfplan
 
 # View outputs
 terraform output
@@ -228,24 +261,32 @@ terraform output
 #### Terraform Resources Created
 
 - Resource Group: `rg-lunchvote-dev`
-- App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
-- App Service: `app-lunchvote-api-dev` (.NET 8.0)
+- Backend App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
+- Backend App Service: `app-lunchvote-api-dev-{random}` (.NET 8.0)
+- Frontend App Service Plan: `plan-lunchvote-spa-dev` (Linux, B1 SKU)
+- Frontend App Service: `app-lunchvote-spa-dev-{random}` (Node.js 20 LTS)
 - SQL Server: `sql-lunchvote-dev` (Entra ID auth only)
 - SQL Database: `sqldb-lunchvote` (Basic tier, 2GB)
 - Key Vault: `kv-lunchvote-dev` (RBAC enabled)
-- Static Web App: `stapp-lunchvote-dev` (optional)
+- Static Web App: `stapp-lunchvote-dev` (optional, disabled by default)
+
+**Note:** The Terraform Azure App Service provider currently supports .NET 8.0 as the runtime. While the application code is built with .NET 10.0, it runs on the .NET 8.0 runtime in Azure. For full .NET 10.0 runtime support, use the Bicep deployment option instead.
 
 #### Terraform Configuration
 
-Edit `infra/terraform/terraform.tfvars`:
+The deployment uses command-line variables. If you want to customize defaults, you can override them:
 
-```hcl
-environment             = "dev"
-location                = "australiaeast"
-sql_admin_object_id     = "your-object-id"          # Get from: az ad signed-in-user show --query id -o tsv
-sql_admin_login         = "your-email@domain.com"   # Get from: az ad signed-in-user show --query userPrincipalName -o tsv
-deploy_static_web_app   = false
+```bash
+# Optional: Override default values
+terraform apply \
+  -var="sql_admin_object_id=$OBJECT_ID" \
+  -var="sql_admin_login=$EMAIL" \
+  -var="environment=dev" \
+  -var="location=australiaeast" \
+  -var="deploy_static_web_app=false"
 ```
+
+**Note:** Alternatively, you can create an optional `terraform.tfvars` file (already in .gitignore) with these values to avoid passing them on every command.
 
 ### Deploy Backend
 
@@ -279,36 +320,51 @@ Remove-Item ./publish.zip
 cd src/lunch-vote-spa
 npm run build
 
-# Deploy to Azure Static Web Apps or copy to API wwwroot
+# Deploy to Frontend App Service
+Compress-Archive -Path ./dist/* -DestinationPath ./dist.zip -Force
+
+az webapp deploy \
+  --resource-group rg-lunchvote-dev \
+  --name app-lunchvote-spa-dev-{random-suffix} \
+  --src-path ./dist.zip \
+  --type zip
+
+# Clean up
+Remove-Item ./dist.zip
 ```
+
+**Note:** Replace `{random-suffix}` with the actual suffix from your Terraform deployment output.
 
 ## Infrastructure Features
 
 Both Bicep and Terraform deployments include:
 
 - ✅ **Passwordless Authentication**: SQL Server uses Microsoft Entra ID authentication
-- ✅ **Managed Identity**: App Service uses System-Assigned Managed Identity
+- ✅ **Managed Identity**: App Services use System-Assigned Managed Identity
 - ✅ **RBAC Authorization**: Key Vault uses role-based access control
 - ✅ **Security**: TLS 1.2+, HTTPS-only, soft delete enabled
 - ✅ **Environment Isolation**: Resources named with environment suffix (`-dev`, `-stg`, `-prod`)
-- ✅ **CORS Configuration**: Pre-configured for local development and Azure Static Apps
+- ✅ **CORS Configuration**: Pre-configured for local development
+- ✅ **Dual App Service Architecture**: Separate App Services for Backend API and Frontend SPA
 
 ## Sample Usage
 
 ### Create a Poll
 
 ```bash
-curl -X POST http://localhost:5000/api/polls \
+curl -X POST https://localhost:52544/api/polls \
   -H "Content-Type: application/json" \
-  -d '{"groupId":"platform","question":"Where should we eat today?","options":["Sushi","Burgers","Thai","Pizza"]}'
+  -d '{"groupId":"platform","question":"Where should we eat today?","options":["Sushi","Burgers","Thai","Pizza"]}' \
+  -k
 ```
 
 ### Vote
 
 ```bash
-curl -X POST http://localhost:5000/api/votes \
+curl -X POST https://localhost:52544/api/votes \
   -H "Content-Type: application/json" \
-  -d '{"pollId":"<poll-id>","optionId":"<option-id>","voterToken":"my-unique-token"}'
+  -d '{"pollId":"<poll-id>","optionId":"<option-id>","voterToken":"my-unique-token"}' \
+  -k
 ```
 
 ## License

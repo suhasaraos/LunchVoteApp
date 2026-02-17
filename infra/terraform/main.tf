@@ -32,7 +32,7 @@ module "key_vault" {
   tenant_id           = data.azurerm_client_config.current.tenant_id
 }
 
-# App Service Module
+# API App Service Module
 module "app_service" {
   source = "./modules/app-service"
   location              = azurerm_resource_group.main.location
@@ -53,7 +53,7 @@ module "key_vault_access" {
   principal_id = module.app_service.principal_id
 }
 
-# Static Web App Module (optional)
+# Static Web App Module (optional - only if not using App Service for frontend)
 module "static_web_app" {
   source = "./modules/static-web-app"
   count  = var.deploy_static_web_app ? 1 : 0

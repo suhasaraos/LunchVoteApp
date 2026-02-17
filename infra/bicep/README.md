@@ -10,6 +10,7 @@ bicep/
     ├── sql-database.bicep
     ├── key-vault.bicep
     ├── app-service.bicep
+    ├── frontend-app-service.bicep
     ├── key-vault-access.bicep
     └── static-web-app.bicep
 ```
@@ -70,3 +71,15 @@ az deployment group create \
 # Delete
 az group delete --name rg-lunchvote-dev --yes
 ```
+
+## Resources Created
+
+- Resource Group: `rg-lunchvote-dev`
+- Backend App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
+- Backend App Service: `app-lunchvote-api-dev` (.NET 10.0)
+- Frontend App Service Plan: `plan-lunchvote-spa-dev` (Linux, B1 SKU)
+- Frontend App Service: `app-lunchvote-spa-dev` (Node.js 20 LTS)
+- SQL Server: `sql-lunchvote-dev` (Entra ID auth only)
+- SQL Database: `sqldb-lunchvote` (Basic tier, 2GB)
+- Key Vault: `kv-lunchvote-dev` (RBAC enabled)
+- Static Web App: `stapp-lunchvote-dev` (optional, disabled by default)

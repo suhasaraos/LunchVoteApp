@@ -1,6 +1,6 @@
 
 // Main orchestration template for Lunch Vote App infrastructure
-// Deploys App Service, SQL Database, Key Vault, and Static Web App
+// Deploys Backend API App Service, Frontend SPA App Service, SQL Database, and Key Vault
 
 targetScope = 'resourceGroup'
 
@@ -22,20 +22,21 @@ param deployStaticWebApp bool = false
 
 // Variables
 var resourceSuffix = '-${environment}'
-var appServicePlanName = 'plan-lunchvote${resourceSuffix}'
-var appServiceName = 'app-lunchvote-api${resourceSuffix}'
+var backendAppServicePlanName = 'plan-lunchvote${resourceSuffix}'
+var backendAppServiceName = 'app-lunchvote-api${resourceSuffix}'
+var frontendAppServicePlanName = 'plan-lunchvote-spa${resourceSuffix}'
 var sqlServerName = 'sql-lunchvote${resourceSuffix}'
 var sqlDatabaseName = 'sqldb-lunchvote'
 var keyVaultName = 'kv-lunchvote${resourceSuffix}'
 var staticWebAppName = 'stapp-lunchvote${resourceSuffix}'
 
-// App Service Module
+// Backend App Service Module
 module appService 'modules/app-service.bicep' = {
   name: 'appServiceDeployment'
   params: {
     location: location
-    appServicePlanName: appServicePlanName
-    appServiceName: appServiceName
+    appServicePlanName: backendAppServicePlanName
+    appServiceName: backendAppServiceName
     sqlServerFqdn: sqlDatabase.outputs.sqlServerFqdn
     sqlDatabaseName: sqlDatabaseName
     keyVaultUri: keyVault.outputs.keyVaultUri
@@ -64,7 +65,18 @@ module keyVault 'modules/key-vault.bicep' = {
   }
 }
 
-// NEW: Key Vault Access Assignment
+// Frontend App Service Module
+module frontendAppService 'modules/frontend-app-service.bicep' = {
+  name: 'frontendAppServiceDeployment'
+  params: {
+    location: location
+    appServicePlanName: frontendAppServicePlanName
+    apiBaseUrl: 'https://${appService.outputs.defaultHostname}'
+    environment: environment
+  }
+}
+
+// Key Vault Access Assignment for Backend
 module keyVaultAccess 'modules/key-vault-access.bicep' = {
   name: 'keyVaultAccessDeployment'
   params: {
@@ -86,6 +98,11 @@ module staticWebApp 'modules/static-web-app.bicep' = if (deployStaticWebApp) {
 output appServiceName string = appService.outputs.appServiceName
 output appServiceDefaultHostname string = appService.outputs.defaultHostname
 output appServicePrincipalId string = appService.outputs.principalId
+output apiUrl string = 'https://${appService.outputs.defaultHostname}'
+output frontendAppServiceName string = frontendAppService.outputs.appServiceName
+output frontendAppServiceDefaultHostname string = frontendAppService.outputs.defaultHostname
+output frontendAppServicePrincipalId string = frontendAppService.outputs.principalId
+output frontendUrl string = frontendAppService.outputs.url
 output sqlServerFqdn string = sqlDatabase.outputs.sqlServerFqdn
 output sqlDatabaseName string = sqlDatabase.outputs.databaseName
 output keyVaultUri string = keyVault.outputs.keyVaultUri
