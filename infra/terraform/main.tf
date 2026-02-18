@@ -3,6 +3,7 @@ resource "random_string" "common_suffix" {
   special = false
   upper   = false
 }
+
 # Main orchestration for Lunch Vote App infrastructure
 # Deploys App Service, SQL Database, Key Vault, and Static Web App
 
@@ -49,12 +50,6 @@ module "app_service" {
   env                   = var.env
   suffix                = random_string.common_suffix.result
   frontend_url          = "https://app-lunchvote-spa-${var.env}-${random_string.common_suffix.result}.azurewebsites.net"
-}-${var.env}"
-  app_service_name      = "app-${var.name}-api-${var.env}"
-  sql_server_fqdn       = module.sql_database.sql_server_fqdn
-  sql_database_name     = module.sql_database.database_name
-  key_vault_uri         = module.key_vault.key_vault_uri
-  env                   = var.env
 }
 
 # Frontend App Service Module
@@ -66,9 +61,6 @@ module "frontend_app_service" {
   api_base_url          = "https://app-lunchvote-api-${var.env}-${random_string.common_suffix.result}.azurewebsites.net"
   environment           = var.env
   suffix                = random_string.common_suffix.result
-}-frontend-${var.env}"
-  api_base_url          = "https://${module.app_service.default_hostname}"
-  environment           = var.env
 }
 
 # Key Vault Access Module
@@ -86,4 +78,3 @@ module "static_web_app" {
   resource_group_name = azurerm_resource_group.main.name
   static_web_app_name = "stapp-${var.name}-${var.env}"
 }
-
