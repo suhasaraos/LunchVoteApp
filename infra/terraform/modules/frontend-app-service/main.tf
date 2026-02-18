@@ -1,14 +1,10 @@
 # Frontend App Service Module
 # Creates App Service for the React/Vite SPA
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
+
 
 resource "azurerm_service_plan" "frontend" {
-  name                = "${var.app_service_plan_name}-${random_string.suffix.result}"
+  name                = "${var.app_service_plan_name}-${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
   os_type             = "Linux"
@@ -16,7 +12,7 @@ resource "azurerm_service_plan" "frontend" {
 }
 
 resource "azurerm_linux_web_app" "frontend" {
-  name                = "app-lunchvote-spa-${var.environment}-${random_string.suffix.result}"
+  name                = "app-lunchvote-spa-${var.environment}-${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
   service_plan_id     = azurerm_service_plan.frontend.id
@@ -48,3 +44,4 @@ resource "azurerm_linux_web_app" "frontend" {
     "PRE_BUILD_COMMAND" = "npm install -g pm2 serve"
   }
 }
+

@@ -22,3 +22,9 @@ variable "environment" {
   description = "Environment suffix"
   type        = string
 }
+
+variable "suffix" {
+  description = "Random suffix for resource naming"
+  type        = string
+}
+
