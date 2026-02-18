@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ActivePoll, PollResults } from '../types';
-import { getActivePoll, submitVote, createPoll, getPollResults, ApiRequestError } from '../services/api';
+import { getActivePoll, submitVote, getPollResults, ApiRequestError } from '../services/api';
 import { getOrCreateVoterToken } from '../services/voterToken';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorMessage } from './ErrorMessage';
@@ -104,11 +104,6 @@ export function VoteScreen() {
     }
   };
 
-  const handleViewResults = () => {
-    if (poll) {
-      navigate(`/poll/${poll.pollId}/results`);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -241,3 +236,4 @@ export function VoteScreen() {
     </div>
   );
 }
+

@@ -292,6 +292,24 @@ terraform apply \
 
 The deployment process uses zip deployment to Azure App Service.
 
+**Step 1: Get your App Service name**
+
+The resource name depends on your deployment method:
+
+```bash
+# For TERRAFORM deployments - Get the actual name with random suffix
+cd infra/terraform
+terraform output backend_app_service_name
+
+# OR query Azure directly
+az webapp list --resource-group rg-lunchvote-dev --query "[?contains(name, 'api')].name" -o tsv
+
+# For BICEP deployments - The name is fixed
+# app-lunchvote-api-dev
+```
+
+**Step 2: Build, package, and deploy**
+
 ```bash
 cd src/LunchVoteApi
 
@@ -302,14 +320,35 @@ dotnet publish -c Release -o ./publish
 Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force
 
 # Deploy the zip archive to Azure App Service
+# Replace <app-service-name> with the actual name from Step 1
 az webapp deploy \
   --resource-group rg-lunchvote-dev \
-  --name app-lunchvote-api-dev \
+  --name <app-service-name> \
   --src-path ./publish.zip \
   --type zip
 
 # Clean up
 Remove-Item ./publish.zip
+Remove-Item -Recurse ./publish
+```
+
+**Step 3: Verify deployment**
+
+```bash
+# Check deployment status
+az webapp show \
+  --resource-group rg-lunchvote-dev \
+  --name <app-service-name> \
+  --query "state" -o tsv
+
+# Get the App Service URL
+az webapp show \
+  --resource-group rg-lunchvote-dev \
+  --name <app-service-name> \
+  --query "defaultHostName" -o tsv
+
+# Test the API
+curl https://<app-service-name>.azurewebsites.net/api/health
 ```
 
 **Note:** The `az webapp deploy` command with `--type zip` performs a zip deployment. 
