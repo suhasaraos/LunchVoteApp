@@ -6,6 +6,10 @@ A team-based lunch voting application that enables groups within an organization
 
 ```
 LunchVoteApp/
+├── .github/
+│   └── instructions/          # GitHub Copilot instruction files
+│       ├── module_generation_azure.instructions.md
+│       └── terraform_coding_standards_azure.instructions.md
 ├── src/
 │   ├── LunchVoteApi/          # .NET 10 Web API
 │   └── lunch-vote-spa/        # React + Vite + TypeScript SPA
@@ -16,6 +20,8 @@ LunchVoteApp/
 │   └── terraform/             # Terraform IaC templates
 └── LunchVoteApp.sln           # Visual Studio solution file
 ```
+
+> **GitHub Copilot Instructions:** The `.github/instructions/` folder contains Terraform coding standards and module generation guidelines. GitHub Copilot automatically follows these instruction files when generating or editing Terraform code in this workspace.
 
 ## Technology Stack
 
@@ -261,10 +267,9 @@ terraform output
 #### Terraform Resources Created
 
 - Resource Group: `rg-lunchvote-dev`
-- Backend App Service Plan: `plan-lunchvote-dev` (Linux, B1 SKU)
+- **Shared** App Service Plan: `plan-lunchvote-dev-{random}` (Linux, **F1 Free** SKU)
 - Backend App Service: `app-lunchvote-api-dev-{random}` (.NET 8.0)
-- Frontend App Service Plan: `plan-lunchvote-spa-dev` (Linux, B1 SKU)
-- Frontend App Service: `app-lunchvote-spa-dev-{random}` (Node.js 20 LTS)
+- Frontend App Service: `app-lunchvote-spa-dev-{random}` (Node.js 20 LTS) — same plan as API
 - SQL Server: `sql-lunchvote-dev` (Entra ID auth only)
 - SQL Database: `sqldb-lunchvote` (Basic tier, 2GB)
 - Key Vault: `kv-lunchvote-dev` (RBAC enabled)
@@ -292,6 +297,7 @@ terraform apply \
 
 The deployment process uses zip deployment to Azure App Service.
 
+<<<<<<< HEAD
 **Step 1: Get your App Service name**
 
 The resource name depends on your deployment method:
@@ -311,10 +317,16 @@ az webapp list --resource-group rg-lunchvote-dev --query "[?contains(name, 'api'
 **Step 2: Build, package, and deploy**
 
 ```bash
+=======
+```powershell
+>>>>>>> e4d65c213315add9b6e5c8b240c367e6e6299846
 cd src/LunchVoteApi
 
 # Build and publish the application
 dotnet publish -c Release -o ./publish
+
+# Remove BuildHost-netcore folder (contains Windows backslash paths that fail on Linux)
+Remove-Item -Recurse -Force ./publish/BuildHost-netcore -ErrorAction SilentlyContinue
 
 # Create a zip archive from the published output
 Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force
@@ -323,12 +335,17 @@ Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force
 # Replace <app-service-name> with the actual name from Step 1
 az webapp deploy \
   --resource-group rg-lunchvote-dev \
+<<<<<<< HEAD
   --name <app-service-name> \
+=======
+  --name app-lunchvote-api-dev-{random-suffix} \
+>>>>>>> e4d65c213315add9b6e5c8b240c367e6e6299846
   --src-path ./publish.zip \
   --type zip
 
 # Clean up
 Remove-Item ./publish.zip
+<<<<<<< HEAD
 Remove-Item -Recurse ./publish
 ```
 
@@ -349,17 +366,36 @@ az webapp show \
 
 # Test the API
 curl https://<app-service-name>.azurewebsites.net/api/health
+=======
+Remove-Item -Recurse -Force ./publish
+>>>>>>> e4d65c213315add9b6e5c8b240c367e6e6299846
 ```
 
-**Note:** The `az webapp deploy` command with `--type zip` performs a zip deployment. 
+**Note:** Replace `{random-suffix}` with the actual suffix from your Terraform deployment output. The `BuildHost-netcore` removal is required when publishing on Windows for a Linux App Service (see Appendix in the Hackathon Guide for details).
 
 ### Deploy Frontend
 
-```bash
+```powershell
 cd src/lunch-vote-spa
+npm install
+
+# Set the API URL (required - Vite embeds this at build time)
+$env:VITE_API_URL = "https://app-lunchvote-api-dev-{random-suffix}.azurewebsites.net/api"
 npm run build
 
-# Deploy to Frontend App Service
+# Disable remote build (we're deploying pre-built static files)
+az webapp config appsettings set \
+  --resource-group rg-lunchvote-dev \
+  --name app-lunchvote-spa-dev-{random-suffix} \
+  --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false
+
+# Configure pm2 to serve the static SPA with client-side routing
+az webapp config set \
+  --resource-group rg-lunchvote-dev \
+  --name app-lunchvote-spa-dev-{random-suffix} \
+  --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"
+
+# Zip and deploy
 Compress-Archive -Path ./dist/* -DestinationPath ./dist.zip -Force
 
 az webapp deploy \
@@ -374,6 +410,33 @@ Remove-Item ./dist.zip
 
 **Note:** Replace `{random-suffix}` with the actual suffix from your Terraform deployment output.
 
+### Configure CORS (API → Frontend)
+
+After deploying both the API and frontend, configure CORS so the SPA can call the API:
+
+```powershell
+# Azure-level CORS
+az webapp cors add \
+  --resource-group rg-lunchvote-dev \
+  --name app-lunchvote-api-dev-{random-suffix} \
+  --allowed-origins "https://app-lunchvote-spa-dev-{random-suffix}.azurewebsites.net"
+
+# .NET application-level CORS (AllowedOrigins config array)
+az webapp config appsettings set \
+  --resource-group rg-lunchvote-dev \
+  --name app-lunchvote-api-dev-{random-suffix} \
+  --settings \
+    AllowedOrigins__0="https://app-lunchvote-spa-dev-{random-suffix}.azurewebsites.net" \
+    AllowedOrigins__1="http://localhost:5173" \
+    AllowedOrigins__2="http://localhost:3000"
+
+# Restart both apps
+az webapp restart --resource-group rg-lunchvote-dev --name app-lunchvote-api-dev-{random-suffix}
+az webapp restart --resource-group rg-lunchvote-dev --name app-lunchvote-spa-dev-{random-suffix}
+```
+
+> **Why two CORS configurations?** Azure App Service has platform-level CORS that runs before your app code. The .NET API also has its own CORS middleware configured via the `AllowedOrigins` setting in `appsettings.json`. Both must include the frontend origin for cross-origin requests to succeed.
+
 ## Infrastructure Features
 
 Both Bicep and Terraform deployments include:
@@ -384,7 +447,7 @@ Both Bicep and Terraform deployments include:
 - ✅ **Security**: TLS 1.2+, HTTPS-only, soft delete enabled
 - ✅ **Environment Isolation**: Resources named with environment suffix (`-dev`, `-stg`, `-prod`)
 - ✅ **CORS Configuration**: Pre-configured for local development
-- ✅ **Dual App Service Architecture**: Separate App Services for Backend API and Frontend SPA
+- ✅ **Shared App Service Plan**: Single F1 Free plan for both Backend API and Frontend SPA (upgrade to S1 for deployment slots)
 
 ## Sample Usage
 

@@ -18,32 +18,32 @@ Today, you'll go from a blank canvas to a fully operational, cloud-native applic
 
 ---
 
-## GitHub Copilot Deep Dive — Your AI Toolkit
+## GitHub Copilot Deep Dive - Your AI Toolkit
 
 Before we begin, let's understand the **GitHub Copilot features** you'll be mastering today. Each challenge deliberately introduces a different Copilot capability so that by the end of the day, you'll be a Copilot power user.
 
 ### Built-in Agents (Chat Personas)
 
-GitHub Copilot in VS Code offers three built-in **agents** — each optimized for different workflows. You select an agent from the dropdown at the top of the Chat view:
+GitHub Copilot in VS Code offers three built-in **agents** - each optimized for different workflows. You select an agent from the dropdown at the top of the Chat view:
 
 | Agent | Shortcut | What It Does | When to Use It |
 |-------|----------|--------------|----------------|
 | **Agent** | `Ctrl+Shift+I` | Autonomously plans, edits files, runs terminal commands, and invokes tools across your workspace | Building features, fixing bugs, scaffolding projects |
 | **Plan** | `/plan` | Creates a structured, step-by-step implementation plan *without* writing code. Hands off to Agent when approved | Complex tasks, architecture decisions, before major changes |
-| **Ask** | `Ctrl+Alt+I` | Answers questions about coding concepts, your codebase, or VS Code itself. Read-only — never modifies files | Learning, exploration, understanding unfamiliar code |
+| **Ask** | `Ctrl+Alt+I` | Answers questions about coding concepts, your codebase, or VS Code itself. Read-only - never modifies files | Learning, exploration, understanding unfamiliar code |
 
 > 💡 **Pro Tip:** Start with **Plan** to think through your approach, then hand off to **Agent** to implement it. This mirrors real-world software engineering: *design first, code second*.
 
 ### Specification-Driven Development with Prompt Files
 
-One of the most powerful (and underused) Copilot features is **Prompt Files** (`.prompt.md`) — reusable, shareable specification files that encode *what* you want built. Think of them as a **spec kit** for AI-assisted development:
+One of the most powerful (and underused) Copilot features is **Prompt Files** (`.prompt.md`) - reusable, shareable specification files that encode *what* you want built. Think of them as a **spec kit** for AI-assisted development:
 
 - **What:** Markdown files with a `.prompt.md` extension stored in `.github/prompts/`
 - **Why:** Instead of typing the same long prompt repeatedly, you encode your specification once and invoke it with `/prompt-name` in chat
 - **How:** They support YAML frontmatter for configuring which agent, model, and tools to use, plus Markdown body with detailed instructions
 - **Bonus:** You can reference workspace files, use variables like `${selection}` and `${input:componentName}`, and share them with your team via Git
 
-**Example — A React Component Spec:**
+**Example - A React Component Spec:**
 ```markdown
 ---
 description: Generate a React component from specification
@@ -64,11 +64,11 @@ Component name: ${input:componentName}
 Component purpose: ${input:description}
 ```
 
-You invoke it in chat by typing: `/react-component` — and Copilot builds it to your exact spec!
+You invoke it in chat by typing: `/react-component` - and Copilot builds it to your exact spec!
 
 ### Custom Instructions (`.github/copilot-instructions.md`)
 
-Custom Instructions are **always-on** rules that shape how Copilot responds — across all chat interactions in your workspace. Unlike prompt files (which you invoke explicitly), custom instructions are automatically applied.
+Custom Instructions are **always-on** rules that shape how Copilot responds - across all chat interactions in your workspace. Unlike prompt files (which you invoke explicitly), custom instructions are automatically applied.
 
 Use them to encode your team's coding standards:
 ```markdown
@@ -97,6 +97,17 @@ Always include variable validation rules.
 
 Switch to your custom agent from the agent dropdown anytime!
 
+### Pre-loaded Terraform Instruction Files (`.github/instructions/`)
+
+This workspace ships with **two Terraform instruction files** in `.github/instructions/` that GitHub Copilot will automatically follow whenever you work on Terraform code. These encode Azure Terraform coding standards and module generation workflows so that Copilot produces compliant infrastructure code out of the box — no extra prompting required.
+
+| File | Purpose |
+|------|---------|
+| `terraform_coding_standards_azure.instructions.md` | Naming conventions, file structure, variable standards, tag management, and Azure-specific best practices |
+| `module_generation_azure.instructions.md` | Step-by-step workflow for generating Core, Pattern, and Configuration Terraform modules |
+
+> 💡 **How it works:** Files with the `.instructions.md` extension in `.github/instructions/` are automatically loaded by GitHub Copilot based on their `applyTo` glob pattern. Because these files use `applyTo: '**'`, they apply to all files in the workspace. You don't need to invoke them — Copilot picks them up automatically.
+
 ### Key Copilot Interactions at a Glance
 
 | Feature | How to Access | Purpose |
@@ -117,12 +128,12 @@ Switch to your custom agent from the agent dropdown anytime!
 
 | Challenge | Primary Copilot Feature Introduced |
 |-----------|--------------------------------------|
-| 1 — The Architect's Blueprint | **Agent mode** + **Custom Agents** for Terraform |
-| 2 — The Frontend Forge | **Prompt Files (Spec Kit)** + **Plan Agent** + **Vision** |
-| 3 — Liftoff! Deploy to the Cloud | **`@terminal`** participant + **Inline Chat** in terminal |
-| 4 — The Vault of Secrets | **Ask Agent** for learning + **`/explain`** command |
-| 5 — The Data Fortress | **Custom Instructions** + **`#codebase`** context |
-| 6 — Ship It Like a Pro | **Code Review** + **Commit Message Generation** |
+| 1 - The Architect's Blueprint | **Agent mode** + **Custom Agents** for Terraform |
+| 2 - The Frontend Forge | **Prompt Files (Spec Kit)** + **Plan Agent** + **Vision** |
+| 3 - Liftoff! Deploy to the Cloud | **`@terminal`** participant + **Inline Chat** in terminal |
+| 4 - The Vault of Secrets | **Ask Agent** for learning + **`/explain`** command |
+| 5 - The Data Fortress | **Custom Instructions** + **`#codebase`** context |
+| 6 - Ship It Like a Pro | **Code Review** + **Commit Message Generation** |
 
 ---
 
@@ -289,21 +300,6 @@ Familiarize yourself with the API endpoints  you'll be building a UI for them:
 
 ---
 
-## 🏆 Challenge Scoring
-
-Each challenge is scored on the following criteria:
-
-| Criteria | Points |
-|----------|--------|
-| **Acceptance Criteria Met** | 60 |
-| **Effective Use of GitHub Copilot** | 20 |
-| **Code Quality & Best Practices** | 10 |
-| **Creativity & Polish** | 10 |
-
-Judges will review your GitHub Copilot chat history, commit messages, and final working solution.
-
----
-
 ## Challenge 1: 🏗️ The Architect's Blueprint
 
 ### *"Every skyscraper starts with a blueprint  yours is written in Terraform"*
@@ -385,7 +381,7 @@ infra/
 
 ### 🤖 GitHub Copilot Skill Focus: Agent Mode + Custom Agents
 
-This challenge introduces **Agent mode** and **Custom Agents** — the most powerful way to use Copilot for code generation.
+This challenge introduces **Agent mode** and **Custom Agents** - the most powerful way to use Copilot for code generation.
 
 #### Step-by-Step: Create a Terraform Custom Agent
 
@@ -422,7 +418,7 @@ You are an expert Terraform engineer specializing in Azure cloud infrastructure.
 
 - **Agent mode (`Ctrl+Shift+I`)**: Let Copilot create files, run `terraform validate`, and fix issues autonomously
 - **Ask mode**: Switch to **Ask** agent to learn: *"Explain the difference between azurerm_role_assignment and azurerm_key_vault_access_policy"*
-- **Inline suggestions**: Open a `.tf` file and start typing `resource "azurerm_` — watch Copilot auto-complete the resource block
+- **Inline suggestions**: Open a `.tf` file and start typing `resource "azurerm_` - watch Copilot auto-complete the resource block
 - **`@terminal`**: In chat, ask `@terminal how do I initialize Terraform in my infra directory?`
 - **`/explain`**: Select a Terraform block and use `/explain` to understand what it does
 
@@ -470,7 +466,7 @@ Using GitHub Copilot, create a React + TypeScript SPA that integrates with the p
 
 ### 🤖 GitHub Copilot Skill Focus: Specification-Driven Development with Prompt Files (Spec Kit)
 
-This challenge introduces **Prompt Files** — your personal **spec kit** for driving Copilot with reusable, structured specifications. Instead of typing ad-hoc prompts, you'll write specifications that encode exactly what you want built.
+This challenge introduces **Prompt Files** - your personal **spec kit** for driving Copilot with reusable, structured specifications. Instead of typing ad-hoc prompts, you'll write specifications that encode exactly what you want built.
 
 #### Step-by-Step: Build Your Spec Kit
 
@@ -479,7 +475,7 @@ This challenge introduces **Prompt Files** — your personal **spec kit** for dr
 mkdir -p .github/prompts
 ```
 
-**2. Create a project scaffold spec** — `.github/prompts/scaffold-react-app.prompt.md`:
+**2. Create a project scaffold spec** - `.github/prompts/scaffold-react-app.prompt.md`:
 ```markdown
 ---
 description: Scaffold a React + TypeScript SPA with Vite
@@ -512,7 +508,7 @@ src/lunch-vote-spa/
 ```
 ```
 
-**3. Create a component generation spec** — `.github/prompts/react-component.prompt.md`:
+**3. Create a component generation spec** - `.github/prompts/react-component.prompt.md`:
 ```markdown
 ---
 description: Generate a React component from specification
@@ -535,7 +531,7 @@ Create a React functional component with TypeScript for the Lunch Vote App.
 - Follow existing patterns from the project's components/ directory
 ```
 
-**4. Create an API service spec** — `.github/prompts/api-service.prompt.md`:
+**4. Create an API service spec** - `.github/prompts/api-service.prompt.md`:
 ```markdown
 ---
 description: Generate the API service layer for Lunch Vote App
@@ -647,9 +643,9 @@ Provision your Terraform infrastructure to Azure and deploy both the API and SPA
 
 ### 🤖 GitHub Copilot Skill Focus: `@terminal` Participant + Inline Terminal Chat
 
-This challenge is all about command-line work — and Copilot shines here too!
+This challenge is all about command-line work - and Copilot shines here too!
 
-#### `@terminal` — Your Command-Line Guide
+#### `@terminal` - Your Command-Line Guide
 
 Instead of Googling Azure CLI syntax, ask Copilot directly in chat:
 - `@terminal How do I deploy a zip file to Azure App Service?`
@@ -658,7 +654,7 @@ Instead of Googling Azure CLI syntax, ask Copilot directly in chat:
 
 #### Inline Chat in the Terminal
 
-Press `Ctrl+I` while your cursor is in the **integrated terminal** to open Inline Chat. Describe what you want in natural language — Copilot generates the command:
+Press `Ctrl+I` while your cursor is in the **integrated terminal** to open Inline Chat. Describe what you want in natural language - Copilot generates the command:
 - *"Publish my .NET app to a folder called publish"*  → `dotnet publish -c Release -o ./publish`
 - *"Zip all files in the publish folder"* → `Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force`
 - *"Show me the terraform outputs"* → `terraform output`
@@ -799,16 +795,16 @@ Configure your deployed Azure infrastructure so the backend App Service can secu
 
 ### 🤖 GitHub Copilot Skill Focus: Ask Agent + `/explain` for Deep Learning
 
-Security concepts like Managed Identity, RBAC, and Key Vault can be complex. This challenge is designed for **learning** — and the **Ask** agent is your teacher.
+Security concepts like Managed Identity, RBAC, and Key Vault can be complex. This challenge is designed for **learning** - and the **Ask** agent is your teacher.
 
 #### Using Ask Agent to Learn
 
-Switch to the **Ask** agent from the dropdown (it never modifies files — safe for exploration):
+Switch to the **Ask** agent from the dropdown (it never modifies files - safe for exploration):
 
 - *"Explain how Azure Managed Identity works at a technical level. How does the token exchange happen?"*
 - *"What's the difference between System-Assigned and User-Assigned Managed Identity?"*
 - *"Why is RBAC preferred over Key Vault access policies?"*
-- *"What happens when my App Service tries to access Key Vault — walk me through the authentication flow"*
+- *"What happens when my App Service tries to access Key Vault - walk me through the authentication flow"*
 
 #### `/explain` on Terraform Code
 
@@ -819,7 +815,7 @@ Select your Key Vault Terraform module and use `/explain` to understand each pro
 
 #### Multi-Model Exploration
 
-Try asking the same question to **different AI models** using the model picker (click the model name at the bottom of chat). Compare how Claude, GPT, and other models explain Managed Identity differently — you'll get richer understanding from multiple perspectives!
+Try asking the same question to **different AI models** using the model picker (click the model name at the bottom of chat). Compare how Claude, GPT, and other models explain Managed Identity differently - you'll get richer understanding from multiple perspectives!
 
 ### Acceptance Criteria
 
@@ -908,7 +904,7 @@ Wire up your deployed backend API to the Azure SQL Database provisioned by Terra
 
 ### 🤖 GitHub Copilot Skill Focus: Custom Instructions + `#codebase` Context
 
-This challenge introduces **Custom Instructions** — always-on rules that shape every Copilot response in your workspace.
+This challenge introduces **Custom Instructions** - always-on rules that shape every Copilot response in your workspace.
 
 #### Step-by-Step: Create Custom Instructions
 
@@ -917,7 +913,7 @@ This challenge introduces **Custom Instructions** — always-on rules that shape
 
 ```markdown
 ## Project Context
-This is the Lunch Vote App — a team-based lunch voting application.
+This is the Lunch Vote App - a team-based lunch voting application.
 - Backend: .NET 10 Web API with Entity Framework Core
 - Frontend: React + TypeScript SPA with Vite
 - Database: Azure SQL Database with Entra ID authentication
@@ -1007,6 +1003,22 @@ The swap operation works by changing the routing rules, not moving files, making
 - **Traffic routing**  Gradually route a percentage of traffic to the new version (canary deployments)
 - **Slot-specific settings**  Some settings can be "sticky" to a slot (e.g., different database for staging vs production)
 
+> ⚠️ **Important: Free (F1) Tier Does Not Support Deployment Slots**
+>
+> The Terraform templates deploy the App Service Plan on the **F1 Free** tier (a single shared plan for both the API and SPA). The Free tier **does not** support deployment slots. You **must** upgrade to at least **Standard S1** before you can create a staging slot.
+>
+> **Upgrade via Azure CLI (recommended for this challenge):**
+> ```powershell
+> # Get the plan name from Terraform output
+> cd infra/terraform
+> $PLAN_NAME = terraform output -raw service_plan_name
+>
+> # Upgrade to Standard S1
+> az appservice plan update --name $PLAN_NAME --resource-group rg-lunchvote-dev --sku S1
+> ```
+>
+> Alternatively, update the `sku_name` in your Terraform `app-service` module from `"F1"` to `"S1"` and run `terraform apply`.
+
 #### App Service Scaling & Monitoring
 Beyond deployment, you'll explore:
 - **Application logging**  View real-time logs from your App Service using `az webapp log tail`
@@ -1015,11 +1027,11 @@ Beyond deployment, you'll explore:
 
 ### Your Mission
 
-Upgrade your App Service to support deployment slots, implement a blue/green deployment workflow, and demonstrate zero-downtime releases.
+Upgrade your App Service Plan from Free (F1) to Standard (S1), create a staging deployment slot, implement a blue/green deployment workflow, and demonstrate zero-downtime releases.
 
 ### 🤖 GitHub Copilot Skill Focus: Code Review + Commit Message Generation
 
-For the final challenge, you'll use Copilot as a **code reviewer** and **DevOps assistant** — the capstone of your Copilot journey.
+For the final challenge, you'll use Copilot as a **code reviewer** and **DevOps assistant** - the capstone of your Copilot journey.
 
 #### AI-Powered Code Review
 
@@ -1053,7 +1065,7 @@ Use **Quick Chat** (`Ctrl+Shift+Alt+L`) for fast questions without leaving your 
 
 | # | Criteria | Details |
 |---|----------|---------|
-| ✅ 1 | **Tier upgraded** | The backend API App Service Plan is upgraded to at least **Standard S1** tier (required for deployment slots). Update your Terraform and apply, or use Azure CLI |
+| ✅ 1 | **Tier upgraded** | The shared App Service Plan (used by both API and SPA) is upgraded from **F1 Free** to at least **Standard S1** tier. Use Azure CLI: `az appservice plan update --name <PLAN_NAME> --resource-group <RG> --sku S1`, or update the `sku_name` in Terraform and apply |
 | ✅ 2 | **Staging slot created** | A deployment slot named `staging` exists on the backend API App Service |
 | ✅ 3 | **Deploy to staging** | Deploy a new version of the API to the **staging** slot (not production). The staging slot should have its own URL (e.g., `https://app-lunchvote-api-dev-xxx-staging.azurewebsites.net`) |
 | ✅ 4 | **Verify staging** | Access the staging slot's Swagger UI or API endpoint and confirm it's running correctly |
@@ -1069,8 +1081,12 @@ Use **Quick Chat** (`Ctrl+Shift+Alt+L`) for fast questions without leaving your 
 > 💡 Use GitHub Copilot to help construct and troubleshoot these commands.
 
 ```powershell
-# Upgrade App Service Plan to Standard S1 (if not already via Terraform)
-az appservice plan update --name <PLAN_NAME> --resource-group <RG> --sku S1
+# Get the App Service Plan name from Terraform output
+cd infra/terraform
+$PLAN_NAME = terraform output -raw service_plan_name
+
+# Upgrade App Service Plan to Standard S1 (required for deployment slots)
+az appservice plan update --name $PLAN_NAME --resource-group <RG> --sku S1
 
 # Create a staging deployment slot
 az webapp deployment slot create --name <APP_NAME> --resource-group <RG> --slot staging
@@ -1159,7 +1175,7 @@ az group delete --name rg-lunchvote-dev --yes --no-wait
 | **Use `@workspace`** | Ask Copilot about your codebase: *"@workspace What API endpoints does the backend expose?"* |
 | **Use `#codebase`** | *"#codebase Find all places where the connection string is configured"* |
 | **Use `@terminal`** | *"@terminal How do I check if my Terraform state is up to date?"* |
-| **Multi-turn conversations** | Ask follow-up questions — Copilot remembers the full conversation context |
+| **Multi-turn conversations** | Ask follow-up questions - Copilot remembers the full conversation context |
 
 ### Keyboard Shortcuts Cheat Sheet
 
@@ -1245,6 +1261,287 @@ az group delete --name rg-lunchvote-dev --yes --no-wait
   "message": "Human-readable description"
 }
 ```
+
+---
+
+## Appendix A: Common API Deployment Issues & Troubleshooting
+
+
+### Issue 1: .NET Runtime Version Mismatch (Terraform deploys .NET 8.0, App targets .NET 10)
+
+**Symptom:** The App Service is configured with `.NET 8.0` runtime (as set by Terraform), but the Lunch Vote API targets `.NET 10`. The app may fail to start or behave unexpectedly.
+
+**Root Cause:** The Terraform modules in `infra/terraform/` (and `infra/bicep/`) configure the App Service with `.NET 8.0 LTS` as the runtime stack. Since the API project targets `net10.0`, the deployed App Service needs to be updated to match.
+
+**Fix - Update via Azure CLI after `terraform apply`:**
+
+```powershell
+# Check current runtime
+az webapp config show --resource-group rg-lunchvote-dev --name <API_APP_NAME> --query "linuxFxVersion" -o tsv
+
+# Update to .NET 10
+az webapp config set --resource-group rg-lunchvote-dev --name <API_APP_NAME> --linux-fx-version "DOTNETCORE|10.0"
+
+# Restart the app
+az webapp restart --resource-group rg-lunchvote-dev --name <API_APP_NAME>
+```
+
+> ⚠️ **Important:** Always ensure your App Service runtime version matches your project's target framework. Check `<TargetFramework>` in your `.csproj` file.
+
+---
+
+### Issue 2: Zip Deploy Fails with `System.IO.IOException: Invalid argument` (BuildHost-netcore folder)
+
+**Symptom:** Running `az webapp deploy --type zip` returns a **500 error** with a stack trace containing:
+
+```
+System.IO.IOException: Invalid argument :
+  '/home/site/wwwroot/BuildHost-netcore\it\System.CommandLine.resources.dll'
+```
+
+**Root Cause:** The `dotnet publish` output on Windows includes a `BuildHost-netcore` folder that contains files with **Windows-style backslash paths** (e.g., `it\System.CommandLine.resources.dll`). Azure App Service runs on **Linux**, where backslashes in filenames are invalid. When Kudu tries to extract and copy these files, it fails.
+
+**Fix - Remove the folder before zipping:**
+
+```powershell
+# Publish
+dotnet publish src/LunchVoteApi/LunchVoteApi.csproj -c Release -o ./publish
+
+# Remove the problematic folder
+Remove-Item -Recurse -Force ./publish/BuildHost-netcore -ErrorAction SilentlyContinue
+
+# Zip and deploy
+Compress-Archive -Path ./publish/* -DestinationPath ./lunchvoteapi.zip -Force
+az webapp deploy --resource-group <RG_NAME> --name <API_APP_NAME> --src-path ./lunchvoteapi.zip --type zip
+```
+
+> 💡 **Tip:** Always check the publish output for any folders with backslash paths before zipping for a Linux App Service.
+
+---
+
+### Issue 3: API Returns 500 `"An unexpected error occurred."` After Successful Deployment
+
+**Symptom:** The App Service starts successfully (container logs show `Application started`), but every API call returns:
+
+```json
+{"error":"InternalError","message":"An unexpected error occurred."}
+```
+
+**Root Cause:** The Terraform/Bicep deployment configures a **SQL connection string** (`DefaultConnection`) on the App Service using `Active Directory Default` authentication. However, the App Service's **Managed Identity has not been added as a SQL user** - the `infra/scripts/create-sql-user.sql` script hasn't been executed yet. When the API tries to query the database, the connection fails and the global exception handler returns a generic 500.
+
+**Quick Fix - Use in-memory database for initial testing:**
+
+Remove the connection string so the app falls back to its built-in in-memory database with mock data:
+
+```powershell
+# Remove the SQL connection string
+az webapp config connection-string delete \
+  --resource-group <RG_NAME> \
+  --name <API_APP_NAME> \
+  --setting-names DefaultConnection
+
+# Restart the app
+az webapp restart --resource-group <RG_NAME> --name <API_APP_NAME>
+
+# Test - should now return mock data
+curl -s https://<API_APP_NAME>.azurewebsites.net/api/groups
+# Expected: ["platform","security"]
+```
+
+**Proper Fix - Create the SQL user for Managed Identity (Challenge 5):**
+
+1. Update the app service name in `infra/scripts/create-sql-user.sql` to match your actual app name (including the random suffix)
+2. Run the SQL script against `sqldb-lunchvote` while connected as the Entra admin
+3. Restore the connection string:
+
+```powershell
+az webapp config connection-string set \
+  --resource-group <RG_NAME> \
+  --name <API_APP_NAME> \
+  --settings DefaultConnection="Server=tcp:<SQL_SERVER>.database.windows.net,1433;Database=sqldb-lunchvote;Authentication=Active Directory Default;" \
+  --connection-string-type SQLAzure
+```
+
+> 💡 **Debugging Tip:** To see the actual exception, enable application logging:
+> ```powershell
+> az webapp log config --resource-group <RG_NAME> --name <API_APP_NAME> \
+>   --application-logging filesystem --level information
+> az webapp log download --resource-group <RG_NAME> --name <API_APP_NAME> \
+>   --log-file ./app-logs.zip
+> ```
+
+---
+
+### Issue 4: Application Logging Not Enabled by Default
+
+**Symptom:** You're getting errors but can't find any useful logs in the downloaded log files - the Docker container logs show the app started, but no application-level errors are captured.
+
+**Root Cause:** By default, Azure App Service has **application logging disabled** (`fileSystem.level: Off`). The container/platform logs only show startup events, not application exceptions.
+
+**Fix - Enable application logging:**
+
+```powershell
+# Enable file system logging at Information level
+az webapp log config --resource-group <RG_NAME> --name <API_APP_NAME> \
+  --application-logging filesystem --level information
+
+# Trigger the failing request
+curl -s https://<API_APP_NAME>.azurewebsites.net/api/groups
+
+# Download and inspect logs
+az webapp log download --resource-group <RG_NAME> --name <API_APP_NAME> \
+  --log-file ./app-logs.zip
+```
+
+> 💡 **Tip:** Enable logging **before** you start debugging. It's much easier to diagnose issues when you can see the actual exception stack traces.
+
+---
+
+### Quick Reference: Deployment Troubleshooting Checklist
+
+| # | Check | Command |
+|---|-------|---------|
+| 1 | Verify .NET runtime version matches your app | `az webapp config show -g <RG> -n <APP> --query linuxFxVersion -o tsv` |
+| 2 | Check if the app is running | `curl -s https://<APP>.azurewebsites.net/api/groups` |
+| 3 | View App Service app settings | `az webapp config appsettings list -g <RG> -n <APP> -o table` |
+| 4 | View connection strings | `az webapp config connection-string list -g <RG> -n <APP> -o table` |
+| 5 | Check Managed Identity | `az webapp identity show -g <RG> -n <APP> --query principalId -o tsv` |
+| 6 | Enable application logging | `az webapp log config -g <RG> -n <APP> --application-logging filesystem --level information` |
+| 7 | Download logs | `az webapp log download -g <RG> -n <APP> --log-file ./logs.zip` |
+| 8 | Restart the app | `az webapp restart -g <RG> -n <APP>` |
+
+---
+
+## Appendix B: Common Frontend (SPA) Deployment Issues & Troubleshooting
+
+
+### Issue 5: Zip Deploy Returns 400 Bad Request (`SCM_DO_BUILD_DURING_DEPLOYMENT`)
+
+**Symptom:** Running `az webapp deploy --type zip` for the frontend returns a **400 Bad Request**. The Kudu deployment log may show errors about missing `package.json` or failed `npm install`.
+
+**Root Cause:** The frontend App Service has the app setting `SCM_DO_BUILD_DURING_DEPLOYMENT=true` (set by Terraform/Bicep). This tells Kudu to run a build (e.g., `npm install && npm run build`) during deployment. Since you’re deploying **pre-built static files** (the `dist/` output from Vite), there’s no `package.json` or `node_modules` in the zip, and the build step fails.
+
+**Fix - Disable remote build before deploying pre-built artifacts:**
+
+```powershell
+# Disable remote build
+az webapp config appsettings set \
+  --resource-group <RG_NAME> --name <SPA_APP_NAME> \
+  --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false
+
+# Now deploy
+az webapp deploy --resource-group <RG_NAME> --name <SPA_APP_NAME> \
+  --src-path ./dist.zip --type zip
+```
+
+> 💡 **Tip:** If you want Kudu to build from source instead, deploy the entire project directory (including `package.json`) and keep `SCM_DO_BUILD_DURING_DEPLOYMENT=true`.
+
+---
+
+### Issue 6: Frontend Returns Empty Page or Application Error
+
+**Symptom:** After successful zip deployment, navigating to `https://<SPA_APP_NAME>.azurewebsites.net` shows the Azure default page, an empty page, or "Application Error".
+
+**Root Cause:** The Node.js App Service doesn’t know how to serve static files. By default it looks for a `server.js` or `index.js` entry point. Since the Vite build output is just static HTML/CSS/JS, you need to configure a static file server.
+
+**Fix - Set the startup command to use pm2 serve:**
+
+```powershell
+# Configure pm2 to serve the static SPA with client-side routing support
+az webapp config set \
+  --resource-group <RG_NAME> --name <SPA_APP_NAME> \
+  --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"
+
+# Restart
+az webapp restart --resource-group <RG_NAME> --name <SPA_APP_NAME>
+```
+
+> ⚠️ **Important:** The `--spa` flag tells pm2 to redirect all routes to `index.html`, which is required for React Router to work correctly. Without it, refreshing on any non-root route (e.g., `/vote`) will return a 404.
+
+---
+
+### Issue 7: CORS — Frontend Cannot Call the API
+
+**Symptom:** The SPA loads correctly, but API calls fail with CORS errors in the browser console:
+
+```
+Access to fetch at 'https://<API_APP_NAME>.azurewebsites.net/api/...' 
+from origin 'https://<SPA_APP_NAME>.azurewebsites.net' has been blocked by CORS policy
+```
+
+**Root Cause:** The API doesn’t recognize the frontend’s Azure URL as an allowed origin. CORS must be configured in **two places**:
+
+1. **Azure-level CORS** (App Service platform) — the first layer the request hits
+2. **.NET application CORS** (via `AllowedOrigins` config) — the middleware inside the API
+
+**Fix - Configure both layers:**
+
+```powershell
+# 1. Azure-level CORS on the API App Service
+az webapp cors add \
+  --resource-group <RG_NAME> --name <API_APP_NAME> \
+  --allowed-origins "https://<SPA_APP_NAME>.azurewebsites.net"
+
+# 2. .NET application CORS via App Settings
+#    The API reads AllowedOrigins from config (array indexed by __0, __1, etc.)
+az webapp config appsettings set \
+  --resource-group <RG_NAME> --name <API_APP_NAME> \
+  --settings \
+    AllowedOrigins__0="https://<SPA_APP_NAME>.azurewebsites.net" \
+    AllowedOrigins__1="http://localhost:5173" \
+    AllowedOrigins__2="http://localhost:3000"
+
+# 3. Restart the API to pick up the new settings
+az webapp restart --resource-group <RG_NAME> --name <API_APP_NAME>
+```
+
+**Verify CORS is working:**
+
+```powershell
+curl -s -o /dev/null -w "%{http_code}" \
+  -H "Origin: https://<SPA_APP_NAME>.azurewebsites.net" \
+  "https://<API_APP_NAME>.azurewebsites.net/api/groups"
+```
+
+> 💡 **How the API CORS config works:** `Program.cs` reads an `AllowedOrigins` string array from configuration (see lines 42–54). In `appsettings.json` this defaults to localhost URLs for local development. In Azure, App Settings with the `AllowedOrigins__N` naming convention override the array elements. This means **no code changes are needed** — just set the App Settings.
+
+---
+
+### Issue 8: `VITE_API_URL` Must Be Set at Build Time, Not Runtime
+
+**Symptom:** The deployed SPA makes API calls to `/api` (relative URL) instead of the full API URL `https://<API_APP_NAME>.azurewebsites.net/api`, resulting in 404 errors.
+
+**Root Cause:** Vite replaces `import.meta.env.VITE_API_URL` at **build time**, not at runtime. If you run `npm run build` without setting the environment variable, it falls back to `/api` (the default in `api.ts`). Since the SPA and API are on different domains, relative URLs won’t work.
+
+**Fix - Set the environment variable before building:**
+
+```powershell
+# PowerShell
+$env:VITE_API_URL = "https://<API_APP_NAME>.azurewebsites.net/api"
+npm run build
+```
+
+```bash
+# Bash / Linux
+VITE_API_URL=https://<API_APP_NAME>.azurewebsites.net/api npm run build
+```
+
+> ⚠️ **Important:** You must rebuild the SPA every time the API URL changes. The URL is baked into the JavaScript bundle at build time.
+
+---
+
+### Quick Reference: Frontend Deployment Troubleshooting Checklist
+
+| # | Check | Command |
+|---|-------|---------|
+| 1 | Disable remote build for pre-built artifacts | `az webapp config appsettings set -g <RG> -n <SPA> --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false` |
+| 2 | Set pm2 serve startup command | `az webapp config set -g <RG> -n <SPA> --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"` |
+| 3 | Build SPA with correct API URL | `$env:VITE_API_URL="https://<API>.azurewebsites.net/api"; npm run build` |
+| 4 | Add Azure CORS on API | `az webapp cors add -g <RG> -n <API> --allowed-origins "https://<SPA>.azurewebsites.net"` |
+| 5 | Set .NET AllowedOrigins on API | `az webapp config appsettings set -g <RG> -n <API> --settings AllowedOrigins__0="https://<SPA>.azurewebsites.net"` |
+| 6 | Verify SPA serves HTML | `curl -s -o /dev/null -w "%{http_code}" https://<SPA>.azurewebsites.net` |
+| 7 | Verify CORS headers | `curl -sI -H "Origin: https://<SPA>.azurewebsites.net" https://<API>.azurewebsites.net/api/groups` |
+| 8 | Restart both apps | `az webapp restart -g <RG> -n <API>; az webapp restart -g <RG> -n <SPA>` |
 
 ---
 
