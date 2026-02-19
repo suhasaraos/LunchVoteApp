@@ -319,7 +319,7 @@ After each prompt, review the generated code, then move to the next. You can ite
 
 > 💡 **Why Prompt Files?** They turn one-off prompts into **repeatable, shareable specifications**. Your team can commit them to Git, iterate on them, and ensure consistent, high-quality AI output across the group.
 
-#### Additional Copilot Techniques for Frontend Development
+#### Alternative Copilot Techniques for Frontend Development
 
 - **Plan agent first**: Start with the **Plan** agent: *"Plan the component architecture for a voting SPA with 4 screens"*. Review the plan, then click **Start Implementation** to hand off to Agent mode
 - **Vision (image context)**: We've provided UI mockup images in the `challenges/` folder. Drag any of these into the Copilot Chat view and ask Copilot to build the screen as a React component:

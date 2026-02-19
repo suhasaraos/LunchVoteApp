@@ -10,7 +10,10 @@
 
 ### Synopsis
 
-Your app is deployed, secured, and connected to a real database. But is it production-ready? Not yet. Real-world applications need **zero-downtime deployments**, **rollback capabilities**, and **deployment verification** before going live. In this final challenge, you'll level up your deployment game by implementing **Blue/Green Deployment** using Azure App Service **Deployment Slots**  a feature that lets you deploy and test new versions without affecting live users.
+Your app is deployed, secured, and connected to a real database. But is it production-ready? Not yet. Real-world applications need **zero-downtime deployments**, **rollback capabilities**, **deployment verification** before going live, _and_ **private network connectivity** so that data never travels over the public internet. In this final challenge, you'll level up your deployment game on two fronts:
+
+1. **Blue/Green Deployment** — Azure App Service Deployment Slots for instant, zero-downtime releases with rollback.
+2. **Private Network Security** — VNet integration and Private Endpoints so the API reaches the database exclusively over a private network, and Azure SQL's public endpoint is switched off.
 
 ### What You'll Learn
 
@@ -58,6 +61,52 @@ Beyond deployment, you'll explore:
 - **Application logging**  View real-time logs from your App Service using `az webapp log tail`
 - **Health checks**  Configure App Service health checks to automatically replace unhealthy instances
 - **App Service metrics**  View request count, response time, and error rates in the Azure Portal
+
+---
+
+#### Private Connectivity & Network Security
+
+By default, the Azure SQL server accepts connections from any IP address on the public internet (guarded only by credentials). For a production system this is unacceptable. The solution is a **hub-and-spoke networking pattern**:
+
+```
+ Internet
+    │  (blocked — public access disabled on SQL)
+    ▼
+ ┌──────────────────────────────────────────────┐
+ │  Virtual Network  10.0.0.0/16                │
+ │                                              │
+ │  snet-appservice-integration  10.0.1.0/24   │
+ │        ▲  (delegated to Web/serverFarms)     │
+ │        │  App Service VNet Integration       │
+ │        │                                     │
+ │  ┌─────┴────────────────────────────────┐   │
+ │  │           API App Service             │   │
+ │  └───────────────────────┬───────────────┘   │
+ │                           │ outbound via VNet │
+ │  snet-private-endpoints  10.0.2.0/24         │
+ │        ▼                                     │
+ │  ┌───────────────────────────────────────┐   │
+ │  │  Private Endpoint NIC  (private IP)   │   │
+ │  └───────────────────────┬───────────────┘   │
+ │                           │                   │
+ │  Private DNS Zone                            │
+ │  privatelink.database.windows.net            │
+ │  → sql-lunchvote-dev.database.windows.net    │
+ │    resolves to 10.0.2.x  (private IP)        │
+ └──────────────────────────────────────────────┘
+                           │
+                     Azure SQL Server
+```
+
+**Key concepts you'll implement:**
+
+| Concept | What it does |
+|---|---|
+| **Virtual Network (VNet)** | Private address space – `10.0.0.0/16`. All resources in the same VNet can communicate over private IPs. |
+| **App Service VNet Integration** | Connects outbound traffic from the App Service into the VNet, so it leaves through a private NIC rather than the public internet. Requires integration subnet delegated to `Microsoft.Web/serverFarms`. |
+| **Private Endpoint** | Provisions a private NIC inside the VNet with a private IP mapped to the Azure SQL server. Clients resolve the SQL FQDN to this private IP through the private DNS zone. |
+| **Private DNS Zone** | `privatelink.database.windows.net` — overrides public DNS inside the VNet so the SQL server FQDN resolves to the private IP, not the public one. |
+| **Disable Public Access** | Sets `public_network_access_enabled = false` on the SQL server so all connections **must** come through the private endpoint — no exceptions. |
 
 ### Your Mission
 
@@ -109,6 +158,11 @@ Use **Quick Chat** (`Ctrl+Shift+Alt+L`) for fast questions without leaving your 
 | ✅ 8 | **Live log streaming** | Use `az webapp log tail` to stream live logs from the production App Service and demonstrate you can see real-time request/response activity |
 | ✅ 9 | **Terraform updated** | Your Terraform code is updated to include the staging slot configuration and the upgraded SKU |
 | ✅ 10 | **GitHub Copilot** | Used GitHub Copilot to help with slot management commands, Terraform slot configuration, or understanding deployment slot concepts |
+| ✅ 11 | **VNet created** | A Virtual Network named `vnet-lunchvote-dev` (or similar) exists in `rg-lunchvote-dev` with two subnets: `snet-appservice-integration-dev` (`10.0.1.0/24`) and `snet-private-endpoints-dev` (`10.0.2.0/24`) |
+| ✅ 12 | **VNet integration enabled** | The API App Service is integrated with the VNet via the `snet-appservice-integration-dev` subnet. Verify with `az webapp vnet-integration list` |
+| ✅ 13 | **Private endpoint deployed** | A private endpoint for the SQL server exists in `snet-private-endpoints-dev`. The NIC has a private IP in the `10.0.2.0/24` range. Verify with `az network private-endpoint list` |
+| ✅ 14 | **Private DNS zone linked** | `privatelink.database.windows.net` DNS zone exists and is linked to the VNet. Inside the VNet the SQL FQDN resolves to a private IP (not the public one). Verify with `nslookup <sql-fqdn>` from the App Service console |
+| ✅ 15 | **Public access disabled** | The SQL server has `public_network_access_enabled = false`. Confirm with `az sql server show --query publicNetworkAccess` — should return `Disabled` |
 
 ### Useful Commands
 
@@ -142,6 +196,40 @@ az webapp log tail --name <APP_NAME> --resource-group <RG>
 
 # View deployment slot list
 az webapp deployment slot list --name <APP_NAME> --resource-group <RG> -o table
+
+# ---------------------------------------------------------------------------
+# Private Connectivity Verification
+# ---------------------------------------------------------------------------
+
+# List private endpoints in the resource group
+az network private-endpoint list --resource-group rg-lunchvote-dev -o table
+
+# Show the private IP assigned to the SQL private endpoint NIC
+$PE_NAME = az network private-endpoint list --resource-group rg-lunchvote-dev --query "[?contains(name, 'sql')].name" -o tsv
+az network private-endpoint show --name $PE_NAME --resource-group rg-lunchvote-dev --query "customDnsConfigs[0].ipAddresses" -o tsv
+
+# Verify App Service VNet integration
+az webapp vnet-integration list --name <APP_NAME> --resource-group rg-lunchvote-dev -o table
+
+# Verify SQL public access is disabled
+az sql server show --name <SQL_SERVER_NAME> --resource-group rg-lunchvote-dev --query publicNetworkAccess -o tsv
+
+# Verify DNS resolution from App Service (run in Kudu console or SSH)
+# Portal -> App Service -> SSH -> run:
+#   nslookup <sql-server-name>.database.windows.net
+# Private IP (10.0.2.x) = private endpoint is working
+# Public IP = private endpoint is NOT routing correctly
+
+# Verify private DNS zone exists and is linked to VNet
+az network private-dns zone list --resource-group rg-lunchvote-dev -o table
+az network private-dns link vnet list --resource-group rg-lunchvote-dev --zone-name privatelink.database.windows.net -o table
+
+# Enable private networking via Terraform (set in terraform.tfvars)
+# enable_private_networking = true
+# Then run:
+cd infra/terraform
+terraform plan -var="enable_private_networking=true"
+terraform apply -var="enable_private_networking=true"
 ```
 
 ### Terraform Hint for Deployment Slots
@@ -155,3 +243,49 @@ resource "azurerm_linux_web_app_slot" "staging" {
   # ... configure same settings as production
 }
 ```
+
+### Terraform Hints for Private Networking
+
+Ask GitHub Copilot to help you understand these resources, which are already wired into the `private-networking`, `sql-database`, and `app-service` modules in this repo:
+
+```hcl
+# 1. Virtual Network and subnets (modules/private-networking/main.tf)
+resource "azurerm_virtual_network" "main" {
+  name          = "vnet-${var.name}-${var.env}"
+  address_space = ["10.0.0.0/16"]
+  # ...
+}
+
+# Delegation required for App Service VNet integration
+resource "azurerm_subnet" "app_service_integration" {
+  delegation {
+    service_delegation { name = "Microsoft.Web/serverFarms" }
+  }
+}
+
+# 2. Private Endpoint for SQL (modules/sql-database/main.tf)
+resource "azurerm_private_endpoint" "sql" {
+  count     = var.enable_private_endpoint ? 1 : 0
+  subnet_id = var.private_endpoint_subnet_id
+
+  private_service_connection {
+    private_connection_resource_id = azurerm_mssql_server.main.id
+    subresource_names              = ["sqlServer"]
+  }
+
+  private_dns_zone_group {
+    private_dns_zone_ids = [var.private_dns_zone_id]
+  }
+}
+
+# 3. App Service VNet Integration (modules/app-service/main.tf)
+resource "azurerm_linux_web_app" "main" {
+  virtual_network_subnet_id = var.vnet_integration_subnet_id != "" ? var.vnet_integration_subnet_id : null
+  # ...
+}
+
+# 4. To enable it all, set in terraform.tfvars:
+enable_private_networking = true
+```
+
+> ⚠️ **SKU requirement:** App Service VNet Integration requires **Basic (B1) or higher**. Upgrade from F1 → S1 as part of Acceptance Criteria #1 before enabling private networking.

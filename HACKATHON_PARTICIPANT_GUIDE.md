@@ -736,6 +736,178 @@ VITE_API_URL=https://<API_APP_NAME>.azurewebsites.net/api npm run build
 
 ---
 
+## Appendix C: Azure SQL & Managed Identity Troubleshooting (Challenge 5)
+
+---
+
+### Issue 9: SQL Server Has Public Network Access Disabled
+
+**Symptom:** Attempting to connect to Azure SQL from your local machine (via `sqlcmd`, a .NET script, or SSMS) fails with:
+
+```
+Connection was denied because Deny Public Network Access is set to Yes.
+```
+
+**Root Cause:** The Terraform module may deploy the SQL server with `public_network_access_enabled = false` (or the Azure portal default is Disabled). Without public access, only Azure-internal connections and private endpoints can reach the server.
+
+**Fix - Temporarily enable public access for admin scripts, then re-disable if desired:**
+
+```powershell
+# Enable public network access
+az sql server update --name <SQL_SERVER_NAME> --resource-group <RG> --enable-public-network true
+
+# Add your local IP to the firewall
+$myIp = (Invoke-RestMethod -Uri "https://api.ipify.org")
+az sql server firewall-rule create --server <SQL_SERVER_NAME> --resource-group <RG> \
+  --name "LocalAdmin" --start-ip-address $myIp --end-ip-address $myIp
+
+# ... run your admin SQL scripts ...
+
+# Remove the temporary firewall rule when done
+az sql server firewall-rule delete --server <SQL_SERVER_NAME> --resource-group <RG> --name "LocalAdmin"
+```
+
+> 💡 **Note:** The `AllowAllWindowsAzureIps` firewall rule (`0.0.0.0–0.0.0.0`) only allows Azure-hosted services (like App Service) to connect. It does **not** allow connections from your developer machine.
+
+---
+
+### Issue 10: `sqlcmd -G` Fails with MFA Required Error
+
+**Symptom:** Running `sqlcmd` with Azure AD authentication (`-G` flag) fails with:
+
+```
+Failed to authenticate the user '' in Active Directory (Authentication option is 'ActiveDirectoryIntegrated').
+AADSTS50076: Due to a configuration change made by your administrator... you must use multi-factor authentication
+```
+
+**Root Cause:** The `-G` flag uses `ActiveDirectoryIntegrated` (Windows Integrated / Kerberos), which does not support MFA. If your tenant enforces MFA via Conditional Access, this authentication method will always fail.
+
+**Fix - Use a .NET script with `Active Directory Default` auth, which honours Azure CLI cached credentials:**
+
+```powershell
+# Create a temporary .NET console app
+$tmpDir = "$env:TEMP\sql-admin-$(Get-Random)"
+New-Item -ItemType Directory -Path $tmpDir | Out-Null
+Set-Location "$tmpDir"
+dotnet new console -n SqlAdmin --no-restore
+Set-Location SqlAdmin
+dotnet add package Microsoft.Data.SqlClient
+
+# Write the script
+@'
+using Microsoft.Data.SqlClient;
+
+var connStr = "Server=tcp:<SQL_SERVER>.database.windows.net,1433;Database=<DB_NAME>;Authentication=Active Directory Default;Connect Timeout=30;";
+
+// Replace with your App Service name
+var appServiceName = "<APP_SERVICE_NAME>";
+
+var sql = $"""
+    IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = '{appServiceName}')
+        EXEC('CREATE USER [{appServiceName}] FROM EXTERNAL PROVIDER;');
+    ALTER ROLE db_datareader ADD MEMBER [{appServiceName}];
+    ALTER ROLE db_datawriter ADD MEMBER [{appServiceName}];
+    ALTER ROLE db_ddladmin  ADD MEMBER [{appServiceName}];
+    """;
+
+using var conn = new SqlConnection(connStr);
+conn.Open();
+Console.WriteLine("Connected!");
+using var cmd = new SqlCommand(sql, conn);
+cmd.ExecuteNonQuery();
+Console.WriteLine("Managed identity user configured successfully.");
+'@ | Set-Content Program.cs
+
+dotnet run
+```
+
+> 💡 **How it works:** `Active Directory Default` uses the [DefaultAzureCredential](https://learn.microsoft.com/en-us/dotnet/api/azure.identity.defaultazurecredential) chain, which picks up your `az login` token automatically. No MFA prompt needed after your initial CLI login.
+
+---
+
+### Issue 11: EF Core `EnsureCreated()` Fails — Tables Not Created After First Startup
+
+**Symptom:** The App Service starts without error, but API calls return 500. Querying `INFORMATION_SCHEMA.TABLES` shows the database is empty — no `Poll`, `Option`, or `Vote` tables.
+
+**Root Cause:** EF Core's `EnsureCreated()` needs to execute `CREATE TABLE` DDL statements. By default, the `db_datareader` and `db_datawriter` roles only grant **DML** permissions (SELECT, INSERT, UPDATE, DELETE). They do **not** grant permission to create or modify schema objects.
+
+**Fix - Grant the `db_ddladmin` role to the managed identity:**
+
+```powershell
+# Run against your database as the Entra ID admin (see Issue 10 for how to connect)
+ALTER ROLE db_ddladmin ADD MEMBER [<APP_SERVICE_NAME>];
+```
+
+Or include it in the managed identity setup script alongside the other roles:
+
+```sql
+-- Run as Entra ID administrator
+CREATE USER [<APP_SERVICE_NAME>] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [<APP_SERVICE_NAME>];
+ALTER ROLE db_datawriter ADD MEMBER [<APP_SERVICE_NAME>];
+ALTER ROLE db_ddladmin   ADD MEMBER [<APP_SERVICE_NAME>];  -- Required for EnsureCreated()
+```
+
+After granting the role, **restart the App Service** so `EnsureCreated()` runs again on startup:
+
+```powershell
+az webapp restart --name <APP_SERVICE_NAME> --resource-group <RG>
+```
+
+> ⚠️ **Important:** `ASPNETCORE_ENVIRONMENT` must be set to `Development` on the App Service for `EnsureCreated()` to run. The code in `Program.cs` only calls `EnsureCreated()` inside `if (app.Environment.IsDevelopment())`. Verify with:
+> ```powershell
+> az webapp config appsettings list -g <RG> -n <APP_SERVICE_NAME> --query "[?name=='ASPNETCORE_ENVIRONMENT']"
+> ```
+
+---
+
+### Issue 12: Managed Identity SQL User Already Exists — Role Grant Still Required
+
+**Symptom:** Running `CREATE USER [...] FROM EXTERNAL PROVIDER` returns an error saying the user already exists, but the API still returns 500 errors when querying the database.
+
+**Root Cause:** The user may have been created in a previous attempt without the necessary roles being granted. Existence of the database principal doesn't guarantee it has the correct role memberships.
+
+**Fix - Check and grant roles idempotently:**
+
+```sql
+-- Safe to run multiple times
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = '<APP_SERVICE_NAME>')
+    EXEC('CREATE USER [<APP_SERVICE_NAME>] FROM EXTERNAL PROVIDER;');
+
+ALTER ROLE db_datareader ADD MEMBER [<APP_SERVICE_NAME>];
+ALTER ROLE db_datawriter ADD MEMBER [<APP_SERVICE_NAME>];
+ALTER ROLE db_ddladmin   ADD MEMBER [<APP_SERVICE_NAME>];
+```
+
+To verify role membership:
+
+```sql
+SELECT dp.name AS principal_name, r.name AS role_name
+FROM sys.database_role_members rm
+JOIN sys.database_principals dp ON rm.member_principal_id = dp.principal_id
+JOIN sys.database_principals r  ON rm.role_principal_id  = r.principal_id
+WHERE dp.name = '<APP_SERVICE_NAME>';
+```
+
+---
+
+### Quick Reference: Challenge 5 SQL Setup Checklist
+
+| # | Step | Command / Note |
+|---|------|----------------|
+| 1 | Enable SQL public network access (for local admin scripts) | `az sql server update --name <SQL> -g <RG> --enable-public-network true` |
+| 2 | Add your local IP to the SQL firewall | `az sql server firewall-rule create --name LocalAdmin --start-ip-address <IP> --end-ip-address <IP>` |
+| 3 | Verify the `AllowAllWindowsAzureIps` rule exists | `az sql server firewall-rule list --server <SQL> -g <RG> -o table` |
+| 4 | Create managed identity SQL user (use .NET script, not `sqlcmd -G`) | See Issue 10 above |
+| 5 | Grant `db_datareader`, `db_datawriter`, **and `db_ddladmin`** | Required for EF Core `EnsureCreated()` |
+| 6 | Verify `ASPNETCORE_ENVIRONMENT=Development` is set | `az webapp config appsettings list -g <RG> -n <APP> -o table` |
+| 7 | Set the connection string on the App Service | `az webapp config connection-string set ... --settings DefaultConnection="Server=tcp:<SQL>.database.windows.net,1433;Database=<DB>;Authentication=Active Directory Default;"` |
+| 8 | Remove temporary local firewall rule | `az sql server firewall-rule delete --name LocalAdmin` |
+| 9 | Restart App Service to trigger `EnsureCreated()` | `az webapp restart -g <RG> -n <APP_SERVICE_NAME>` |
+| 10 | Verify tables created & API responds 200 | `curl https://<APP_SERVICE_NAME>.azurewebsites.net/api/groups` |
+
+---
+
 ## 🏅 Good Luck, Hackers!
 
 Remember  this hackathon is about **learning**, not perfection. Experiment boldly, break things, and let GitHub Copilot guide you through unfamiliar territory. The best learning happens when you're outside your comfort zone.
