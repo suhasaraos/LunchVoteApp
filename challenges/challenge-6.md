@@ -289,3 +289,37 @@ enable_private_networking = true
 ```
 
 > ⚠️ **SKU requirement:** App Service VNet Integration requires **Basic (B1) or higher**. Upgrade from F1 → S1 as part of Acceptance Criteria #1 before enabling private networking.
+
+---
+
+### 🌟 Beyond the Hackathon — Making It Production-Ready
+
+Congratulations on completing the challenges! You've built, deployed, secured, and scaled a real cloud application. But in a true enterprise environment, there's more to consider before going to production. These aren't part of today's hackathon, but they're worth knowing about as you take your Azure skills forward.
+
+#### Observability & Monitoring
+
+- **Azure Application Insights** — Add the Application Insights SDK to your .NET API for automatic collection of request traces, dependency calls (SQL queries, HTTP calls), exceptions, and custom metrics. This gives you end-to-end distributed tracing across your frontend and backend. [→ Learn more](https://learn.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core)
+- **Azure Monitor Alerts** — Set up alert rules that notify your team when response times exceed thresholds, error rates spike, or your App Service becomes unhealthy. Alerts can trigger emails, SMS, Azure Functions, or Logic Apps. [→ Learn more](https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-overview)
+- **Log Analytics Workspace** — Centralise all your logs (App Service, SQL Database, Key Vault audit logs) into a single Log Analytics workspace and query them with **KQL (Kusto Query Language)**. This is essential for incident investigation and compliance. [→ Learn more](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-overview)
+- **Azure Dashboard & Workbooks** — Create custom dashboards in the Azure Portal that show real-time metrics, availability, and SLO tracking for your application at a glance. [→ Learn more](https://learn.microsoft.com/en-us/azure/azure-monitor/visualize/workbooks-overview)
+
+#### Security Hardening
+
+- **Microsoft Defender for Cloud** — Enable Defender for App Service and Defender for SQL to get continuous security assessments, vulnerability scanning, and threat detection. It flags misconfigurations (e.g., TLS version, HTTPS enforcement) and alerts on suspicious activity like SQL injection attempts. [→ Learn more](https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction)
+- **Azure DDoS Protection** — For internet-facing applications, Azure DDoS Protection provides always-on traffic monitoring and automatic attack mitigation at the network edge. [→ Learn more](https://learn.microsoft.com/en-us/azure/ddos-protection/ddos-protection-overview)
+- **Managed Certificates & Custom Domains** — App Service provides free managed TLS certificates for custom domains, automatically renewing them. No more expired certificates in production. [→ Learn more](https://learn.microsoft.com/en-us/azure/app-service/configure-ssl-certificate)
+
+#### Reliability & Disaster Recovery
+
+- **Autoscaling** — Configure rule-based or metric-based autoscaling on your App Service Plan to handle traffic spikes without manual intervention. Scale out to multiple instances and back down during quiet periods. [→ Learn more](https://learn.microsoft.com/en-us/azure/azure-monitor/autoscale/autoscale-overview)
+- **Azure SQL Geo-Replication** — Replicate your database to a secondary Azure region for disaster recovery. If your primary region goes down, you can failover to the secondary within minutes. [→ Learn more](https://learn.microsoft.com/en-us/azure/azure-sql/database/active-geo-replication-overview)
+- **Azure Backup** — Enable automated backups for your App Service and configure long-term retention policies for your SQL Database to meet compliance requirements.
+- **Health Checks** — Configure App Service health check endpoints so Azure automatically detects and replaces unhealthy instances without manual intervention. [→ Learn more](https://learn.microsoft.com/en-us/azure/app-service/monitor-instances-health-check)
+
+#### CI/CD & Governance
+
+- **GitHub Actions** — Automate your entire deployment pipeline: run tests, build artifacts, deploy to the staging slot, run smoke tests, and swap to production — all triggered by a pull request merge. [→ Learn more](https://learn.microsoft.com/en-us/azure/app-service/deploy-github-actions)
+- **Azure Policy** — Enforce organisational standards across all Azure resources (e.g., "all storage accounts must use HTTPS", "all SQL servers must have Entra-only authentication"). Non-compliant resources are flagged or blocked automatically. [→ Learn more](https://learn.microsoft.com/en-us/azure/governance/policy/overview)
+- **Resource Locks** — Prevent accidental deletion of critical resources (like your SQL Database or Key Vault) by applying `CanNotDelete` locks. [→ Learn more](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources)
+
+> 💡 **Tip:** Ask Azure Copilot in the Azure Portal: *"What security recommendations do you have for my resource group rg-lunchvote-dev?"* — it will surface actionable Advisor recommendations across all your deployed resources.

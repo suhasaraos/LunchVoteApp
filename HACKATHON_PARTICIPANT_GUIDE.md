@@ -131,8 +131,8 @@ This workspace ships with **two Terraform instruction files** in `.github/instru
 | 1 - The Architect's Blueprint | **Agent mode** + **Custom Agents** for Terraform |
 | 2 - The Frontend Forge *(Optional)* | **Prompt Files** + **Plan Agent** + **Vision** |
 | 3 - Liftoff! Deploy to the Cloud | **`@terminal`** participant + **Inline Chat** in terminal |
-| 4 - The Vault of Secrets | **Ask Agent** for learning + **`/explain`** command |
-| 5 - The Data Fortress | **Custom Instructions** + **`#codebase`** context |
+| 4 - The Data Fortress | **Custom Instructions** + **`#codebase`** context |
+| 5 - The Vault of Secrets | **Ask Agent** for learning + **`/explain`** command |
 | 6 - Ship It Like a Pro | **Code Review** + **Commit Message Generation** |
 
 ---
@@ -146,8 +146,8 @@ This workspace ships with **two Terraform instruction files** in `.github/instru
 | 10:30 – 11:30 | Challenge 2 | 🎨 The Frontend Forge *(Optional)* |
 | 11:30 – 12:30 | Challenge 3 | ☁️ Liftoff! Deploy to the Cloud |
 | 12:30 – 13:00 |  | **Lunch Break** *(vote on it using your app!)* |
-| 13:00 – 14:00 | Challenge 4 | 🔐 The Vault of Secrets |
-| 14:00 – 15:00 | Challenge 5 | 🗃️ The Data Fortress |
+| 13:00 – 14:00 | Challenge 4 | �️ The Data Fortress |
+| 14:00 – 15:00 | Challenge 5 | 🔐 The Vault of Secrets |
 | 15:00 – 16:00 | Challenge 6 | 🚢 Ship It Like a Pro |
 | 16:00 – 16:30 |  | **Demo, Retrospective & Awards** |
 
@@ -309,8 +309,8 @@ Each challenge is documented in its own file. Complete them in order (Challenge 
 | 1 | [🏗️ The Architect's Blueprint](challenges/challenge-1.md) | ~60 min | Use GitHub Copilot to author Terraform IaC and provision Azure resources |
 | 2 | [🎨 The Frontend Forge *(Optional)*](challenges/challenge-2.md) | ~60 min | Build a React + TypeScript SPA with GitHub Copilot assistance |
 | 3 | [☁️ Liftoff! Deploy to the Cloud](challenges/challenge-3.md) | ~60 min | Deploy the backend API and frontend SPA to Azure App Service |
-| 4 | [🔐 The Vault of Secrets](challenges/challenge-4.md) | ~60 min | Secure secrets with Azure Key Vault and Managed Identity |
-| 5 | [🗃️ The Data Fortress](challenges/challenge-5.md) | ~60 min | Migrate from in-memory storage to Azure SQL with EF Core |
+| 4 | [�️ The Data Fortress](challenges/challenge-4.md) | ~60 min | Migrate from in-memory storage to Azure SQL with EF Core |
+| 5 | [🔐 The Vault of Secrets](challenges/challenge-5.md) | ~60 min | Secure secrets with Azure Key Vault and Managed Identity |
 | 6 | [🚢 Ship It Like a Pro](challenges/challenge-6.md) | ~60 min | Implement Blue/Green deployment with Azure App Service Deployment Slots |
 
 ---
@@ -331,6 +331,8 @@ Before the final demo at 16:00, ensure you can demonstrate:
 | 8 | Data persists across App Service restarts | ⬜ |
 | 9 | Blue/Green deployment with staging slot swap demonstrated | ⬜ |
 | 10 | Live log streaming shown | ⬜ |
+
+> 💡 **What's next?** Challenge 6 includes a **"Beyond the Hackathon"** section with Azure best practices for production readiness — covering Application Insights, Defender for Cloud, autoscaling, CI/CD with GitHub Actions, and more. Review it after the hackathon to understand what it takes to run enterprise-grade applications on Azure.
 
 ---
 
@@ -539,7 +541,7 @@ curl -s https://<API_APP_NAME>.azurewebsites.net/api/groups
 # Expected: ["platform","security"]
 ```
 
-**Proper Fix - Create the SQL user for Managed Identity (Challenge 5):**
+**Proper Fix - Create the SQL user for Managed Identity (Challenge 4):**
 
 1. Update the app service name in `infra/scripts/create-sql-user.sql` to match your actual app name (including the random suffix)
 2. Run the SQL script against `sqldb-lunchvote` while connected as the Entra admin
@@ -736,7 +738,7 @@ VITE_API_URL=https://<API_APP_NAME>.azurewebsites.net/api npm run build
 
 ---
 
-## Appendix C: Azure SQL & Managed Identity Troubleshooting (Challenge 5)
+## Appendix C: Azure SQL & Managed Identity Troubleshooting (Challenge 4)
 
 ---
 
@@ -891,7 +893,7 @@ WHERE dp.name = '<APP_SERVICE_NAME>';
 
 ---
 
-### Quick Reference: Challenge 5 SQL Setup Checklist
+### Quick Reference: Challenge 4 SQL Setup Checklist
 
 | # | Step | Command / Note |
 |---|------|----------------|

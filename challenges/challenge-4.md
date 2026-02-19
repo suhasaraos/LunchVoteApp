@@ -1,6 +1,6 @@
-# Challenge 4: 🔐 The Vault of Secrets
+# Challenge 4: 🗃️ The Data Fortress
 
-### *"In the cloud, secrets should never be out in the open"*
+### *"From in-memory whispers to a fortress of persistent data"*
 
 **Duration:** ~60 minutes
 
@@ -10,101 +10,105 @@
 
 ### Synopsis
 
-Your app is live, but there's a problem  configuration values like connection strings and API keys are sitting in plain text in app settings. In the real world, this is a security nightmare. Enter **Azure Key Vault** and **Managed Identity**  two Azure services that work together to give your application **passwordless, secure access** to sensitive configuration.
-
-In this challenge, you'll configure your deployed App Service to authenticate to Key Vault using its **Managed Identity** (no passwords, no keys, no secrets stored in code), store a secret in Key Vault, and have your application read it at runtime.
+Right now, your application is running on an **in-memory database**  every time the App Service restarts, all polls and votes vanish like they never existed. That's fine for development, but production apps need **persistent, reliable data storage**. In this challenge, you'll connect your Lunch Vote App to **Azure SQL Database**  a fully managed relational database in the cloud  using **passwordless authentication** via Managed Identity.
 
 ### What You'll Learn
 
-#### Azure Key Vault
-**Azure Key Vault** is a cloud service for securely storing and tightly controlling access to:
-- **Secrets**  Connection strings, API keys, passwords
-- **Keys**  Encryption keys for data protection
-- **Certificates**  SSL/TLS certificates
+#### Azure SQL Database
+**Azure SQL Database** is a fully managed relational database engine based on Microsoft SQL Server. Key advantages:
 
-Key benefits:
-- **Centralized secret management**  One place to manage all secrets
-- **Access auditing**  Full audit log of who accessed what and when
-- **Soft delete & purge protection**  Accidentally deleted secrets can be recovered
-- **HSM-backed**  Hardware Security Module protection for encryption keys
+- **Fully managed**  Azure handles patching, backups, high availability, and disaster recovery
+- **Scalable**  Scale compute and storage independently, from Basic tier (5 DTUs) to Business Critical
+- **Built-in intelligence**  Automatic performance tuning, threat detection, and vulnerability assessments
+- **Geo-replication**  Replicate data across Azure regions for disaster recovery
+- **Familiar T-SQL**  Use the same SQL you already know from SQL Server
 
-#### Azure Managed Identity
-**Managed Identity** is Azure's answer to the "how do I authenticate without storing passwords?" problem. When you enable a **System-Assigned Managed Identity** on an App Service, Azure automatically:
+#### Microsoft Entra ID Authentication for SQL
+Traditional SQL Server uses username/password authentication. Modern Azure SQL supports **Microsoft Entra ID (formerly Azure AD) authentication**, which offers:
 
-1. Creates an identity (service principal) in Microsoft Entra ID
-2. Manages the credentials (no passwords for you to rotate!)
-3. Lets your app authenticate to other Azure services using that identity
+- **Passwordless access**  Applications authenticate using Managed Identity tokens
+- **Centralized identity**  All access controlled through your organization's directory
+- **Conditional access**  Apply policies like MFA requirements
+- **Auditable**  See exactly who accessed the database and when
 
-This eliminates the "chicken-and-egg" problem: *"I need a secret to access the secrets store."* With Managed Identity, your app authenticates using its Azure-managed identity  no secrets required.
+In this challenge, you'll configure SQL Server with **Entra ID authentication only**  fully eliminating SQL passwords from your architecture.
 
-#### RBAC (Role-Based Access Control)
-Instead of legacy access policies, modern Key Vault uses **RBAC** to control who can do what. Common roles:
-- **Key Vault Secrets User**  Can read secret values (what your App Service needs)
-- **Key Vault Secrets Officer**  Can read, write, and delete secrets (for administrators)
-- **Key Vault Administrator**  Full management access
+#### Entity Framework Core Migrations
+**Entity Framework Core (EF Core)** is .NET's ORM (Object-Relational Mapper) that maps C# classes to database tables. The application uses EF Core with the `EnsureCreated()` approach  it automatically creates the database schema on first connection. When connected to Azure SQL, this will create the `Poll`, `Option`, and `Vote` tables automatically.
+
+#### Connection Strings with Active Directory Default
+The connection string uses `Authentication=Active Directory Default`, which tells the SQL client to authenticate using the app's Managed Identity when running in Azure, or your Azure CLI credentials when running locally. No password needed!
+
+```
+Server=tcp:<server>.database.windows.net,1433;Database=<database-name>;Authentication=Active Directory Default;
+```
+
+> **Note:** Both `<server>` and `<database-name>` include a random 6-character suffix added by Terraform (e.g., `sql-lunchvote-dev-a1b2c3` and `sqldb-lunchvote-a1b2c3`). Run `terraform output` to get the actual values.
 
 ### Your Mission
 
-Configure your deployed Azure infrastructure so the backend App Service can securely access secrets from Key Vault using its Managed Identity  with zero passwords in your codebase.
+Wire up your deployed backend API to the Azure SQL Database provisioned by Terraform, using Managed Identity for passwordless authentication.
 
-### 🤖 GitHub Copilot Skill Focus: Ask Agent + `/explain` for Deep Learning
+### 🤖 GitHub Copilot Skill Focus: Custom Instructions + `#codebase` Context
 
-Security concepts like Managed Identity, RBAC, and Key Vault can be complex. This challenge is designed for **learning** - and the **Ask** agent is your teacher.
+This challenge introduces **Custom Instructions** - always-on rules that shape every Copilot response in your workspace.
 
-#### Using Ask Agent to Learn
+#### Step-by-Step: Create Custom Instructions
 
-Switch to the **Ask** agent from the dropdown (it never modifies files - safe for exploration):
+1. Create the file `.github/copilot-instructions.md` in your workspace root
+2. Add rules that apply globally to all Copilot interactions:
 
-- *"Explain how Azure Managed Identity works at a technical level. How does the token exchange happen?"*
-- *"What's the difference between System-Assigned and User-Assigned Managed Identity?"*
-- *"Why is RBAC preferred over Key Vault access policies?"*
-- *"What happens when my App Service tries to access Key Vault - walk me through the authentication flow"*
+```markdown
+## Project Context
+This is the Lunch Vote App - a team-based lunch voting application.
+- Backend: .NET 10 Web API with Entity Framework Core
+- Frontend: React + TypeScript SPA with Vite
+- Database: Azure SQL Database with Entra ID authentication
+- Infrastructure: Terraform with modular structure
 
-#### `/explain` on Terraform Code
+## Coding Standards
+- Always use `Authentication=Active Directory Default` for SQL connections (never SQL auth)
+- Use System-Assigned Managed Identity for all Azure service-to-service auth
+- Never hardcode secrets, connection strings, or passwords in code
+- Use RBAC instead of access policies for Key Vault
+- All Terraform resources should follow naming convention: {type}-lunchvote-{environment}
+```
 
-Select your Key Vault Terraform module and use `/explain` to understand each property:
-- What does `enable_rbac_authorization = true` do?
-- What is `soft_delete_retention_days` and why does it matter?
-- What does the `role_definition_name = "Key Vault Secrets User"` role allow?
+Now every Copilot response will respect these rules automatically!
 
-#### Multi-Model Exploration
+#### Using `#codebase` for Project-Aware Responses
 
-Try asking the same question to **different AI models** using the model picker (click the model name at the bottom of chat). Compare how Claude, GPT, and other models explain Managed Identity differently - you'll get richer understanding from multiple perspectives!
+When asking Copilot about database connectivity, use `#codebase` to give it full project context:
+
+- *"#codebase How is the database connection configured in this project? What connection string format does it use?"*
+- *"#codebase Show me how EF Core is configured and what entities exist"*
+- *"#codebase What changes would I need to make to switch from in-memory to Azure SQL?"*
+
+The `#codebase` keyword triggers a semantic search across your entire workspace, giving Copilot rich understanding of your project's patterns.
 
 ### Acceptance Criteria
 
 | # | Criteria | Details |
 |---|----------|---------|
-| ✅ 1 | **Key Vault exists** | Your Terraform-deployed Key Vault is visible in the Azure Portal with RBAC authorization enabled |
-| ✅ 2 | **Managed Identity enabled** | The backend App Service has a System-Assigned Managed Identity with a valid Principal ID |
-| ✅ 3 | **RBAC role assigned** | The App Service's Managed Identity has been granted the **"Key Vault Secrets User"** role on the Key Vault (via your Terraform `azurerm_role_assignment` or Azure CLI) |
-| ✅ 4 | **Secret stored** | At least one secret is stored in Key Vault (e.g., a test secret or the SQL connection string). You can do this via Azure Portal or Azure CLI |
-| ✅ 5 | **App setting configured** | The backend App Service has a `KeyVaultUri` app setting pointing to the Key Vault URI (e.g., `https://kv-lunchvote-dev.vault.azure.net/`) |
-| ✅ 6 | **No plaintext secrets** | Verify that no connection strings, passwords, or API keys are stored as plaintext in app settings, code, or configuration files in your repository |
-| ✅ 7 | **Key Vault accessible** | Demonstrate the App Service can access Key Vault  either by reading the secret through application code or by verifying via Application Logs that Key Vault connectivity succeeds |
-| ✅ 8 | **Your own access** | Grant your own Azure user at least the **"Key Vault Secrets Officer"** role so you can manage secrets via the Portal or CLI |
-| ✅ 9 | **Audit trail** | Show the Key Vault audit/activity log in the Azure Portal demonstrating access events |
-| ✅ 10 | **GitHub Copilot** | Used GitHub Copilot to help with Azure CLI commands for secret management, RBAC assignments, or understanding Managed Identity concepts |
+| ✅ 1 | **SQL Server accessible** | The Azure SQL Server created by Terraform is visible in the Azure Portal with Entra ID admin configured |
+| ✅ 2 | **Firewall configured** | Azure SQL has a firewall rule allowing Azure services (IP range `0.0.0.0 – 0.0.0.0`) and optionally your client IP for management |
+| ✅ 3 | **Connection string set** | The backend App Service has a connection string named `DefaultConnection` with format: `Server=tcp:<server>.database.windows.net,1433;Database=<database-name>;Authentication=Active Directory Default;` (Terraform sets this automatically — use `terraform output` to get actual names) |
+| ✅ 4 | **SQL user created** | The App Service's Managed Identity is added as a user in the SQL Database with `db_datareader` and `db_datawriter` roles |
+| ✅ 5 | **Schema created** | The database tables (`Poll`, `Option`, `Vote`) exist in Azure SQL (auto-created by EF Core's `EnsureCreated()` on application startup when `ASPNETCORE_ENVIRONMENT=Development`) |
+| ✅ 6 | **Persistent data** | Create a poll via the deployed API, restart the App Service, and verify the poll data persists |
+| ✅ 7 | **No SQL passwords** | The entire data access chain uses Managed Identity  no SQL usernames or passwords anywhere |
+| ✅ 8 | **End-to-end test** | Using the deployed Frontend SPA: create a poll, cast votes from multiple browsers/tabs, and view results. Data persists across App Service restarts |
+| ✅ 9 | **GitHub Copilot** | Used GitHub Copilot to help with SQL commands, connection string formats, or troubleshooting database connectivity |
 
-### Useful Azure CLI Commands
+### Creating the SQL Database User
 
-> 💡 Ask GitHub Copilot to help you construct these commands with your specific resource names.
+After the App Service's Managed Identity is enabled, you need to grant it access to the SQL Database. Connect to your database using Azure CLI authentication and run:
 
-```powershell
-# Store a secret in Key Vault
-az keyvault secret set --vault-name <VAULT_NAME> --name "TestSecret" --value "HelloFromVault"
-
-# Read a secret from Key Vault
-az keyvault secret show --vault-name <VAULT_NAME> --name "TestSecret" --query value -o tsv
-
-# List all secrets
-az keyvault secret list --vault-name <VAULT_NAME> -o table
-
-# Assign yourself Key Vault Secrets Officer role
-az role assignment create --role "Key Vault Secrets Officer" \
-  --assignee <YOUR_EMAIL> \
-  --scope /subscriptions/<SUB_ID>/resourceGroups/<RG>/providers/Microsoft.KeyVault/vaults/<VAULT_NAME>
-
-# Check the App Service's Managed Identity principal ID
-az webapp identity show --name <APP_NAME> --resource-group <RG> --query principalId -o tsv
+```sql
+-- Replace <app-service-name> with your actual API App Service name
+CREATE USER [<app-service-name>] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [<app-service-name>];
+ALTER ROLE db_datawriter ADD MEMBER [<app-service-name>];
 ```
+
+> 💡 Ask GitHub Copilot: *"How do I connect to Azure SQL Database using Azure CLI authentication and run a SQL script?"*
