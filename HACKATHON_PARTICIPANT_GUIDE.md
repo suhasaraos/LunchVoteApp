@@ -300,21 +300,6 @@ Familiarize yourself with the API endpoints  you'll be building a UI for them:
 
 ---
 
-## 🏆 Challenge Scoring
-
-Each challenge is scored on the following criteria:
-
-| Criteria | Points |
-|----------|--------|
-| **Acceptance Criteria Met** | 60 |
-| **Effective Use of GitHub Copilot** | 20 |
-| **Code Quality & Best Practices** | 10 |
-| **Creativity & Polish** | 10 |
-
-Judges will review your GitHub Copilot chat history, commit messages, and final working solution.
-
----
-
 ## Challenge 1: 🏗️ The Architect's Blueprint
 
 ### *"Every skyscraper starts with a blueprint  yours is written in Terraform"*
@@ -1018,6 +1003,22 @@ The swap operation works by changing the routing rules, not moving files, making
 - **Traffic routing**  Gradually route a percentage of traffic to the new version (canary deployments)
 - **Slot-specific settings**  Some settings can be "sticky" to a slot (e.g., different database for staging vs production)
 
+> ⚠️ **Important: Free (F1) Tier Does Not Support Deployment Slots**
+>
+> The Terraform templates deploy the App Service Plan on the **F1 Free** tier (a single shared plan for both the API and SPA). The Free tier **does not** support deployment slots. You **must** upgrade to at least **Standard S1** before you can create a staging slot.
+>
+> **Upgrade via Azure CLI (recommended for this challenge):**
+> ```powershell
+> # Get the plan name from Terraform output
+> cd infra/terraform
+> $PLAN_NAME = terraform output -raw service_plan_name
+>
+> # Upgrade to Standard S1
+> az appservice plan update --name $PLAN_NAME --resource-group rg-lunchvote-dev --sku S1
+> ```
+>
+> Alternatively, update the `sku_name` in your Terraform `app-service` module from `"F1"` to `"S1"` and run `terraform apply`.
+
 #### App Service Scaling & Monitoring
 Beyond deployment, you'll explore:
 - **Application logging**  View real-time logs from your App Service using `az webapp log tail`
@@ -1026,7 +1027,7 @@ Beyond deployment, you'll explore:
 
 ### Your Mission
 
-Upgrade your App Service to support deployment slots, implement a blue/green deployment workflow, and demonstrate zero-downtime releases.
+Upgrade your App Service Plan from Free (F1) to Standard (S1), create a staging deployment slot, implement a blue/green deployment workflow, and demonstrate zero-downtime releases.
 
 ### 🤖 GitHub Copilot Skill Focus: Code Review + Commit Message Generation
 
@@ -1064,7 +1065,7 @@ Use **Quick Chat** (`Ctrl+Shift+Alt+L`) for fast questions without leaving your 
 
 | # | Criteria | Details |
 |---|----------|---------|
-| ✅ 1 | **Tier upgraded** | The backend API App Service Plan is upgraded to at least **Standard S1** tier (required for deployment slots). Update your Terraform and apply, or use Azure CLI |
+| ✅ 1 | **Tier upgraded** | The shared App Service Plan (used by both API and SPA) is upgraded from **F1 Free** to at least **Standard S1** tier. Use Azure CLI: `az appservice plan update --name <PLAN_NAME> --resource-group <RG> --sku S1`, or update the `sku_name` in Terraform and apply |
 | ✅ 2 | **Staging slot created** | A deployment slot named `staging` exists on the backend API App Service |
 | ✅ 3 | **Deploy to staging** | Deploy a new version of the API to the **staging** slot (not production). The staging slot should have its own URL (e.g., `https://app-lunchvote-api-dev-xxx-staging.azurewebsites.net`) |
 | ✅ 4 | **Verify staging** | Access the staging slot's Swagger UI or API endpoint and confirm it's running correctly |
@@ -1080,8 +1081,12 @@ Use **Quick Chat** (`Ctrl+Shift+Alt+L`) for fast questions without leaving your 
 > 💡 Use GitHub Copilot to help construct and troubleshoot these commands.
 
 ```powershell
-# Upgrade App Service Plan to Standard S1 (if not already via Terraform)
-az appservice plan update --name <PLAN_NAME> --resource-group <RG> --sku S1
+# Get the App Service Plan name from Terraform output
+cd infra/terraform
+$PLAN_NAME = terraform output -raw service_plan_name
+
+# Upgrade App Service Plan to Standard S1 (required for deployment slots)
+az appservice plan update --name $PLAN_NAME --resource-group <RG> --sku S1
 
 # Create a staging deployment slot
 az webapp deployment slot create --name <APP_NAME> --resource-group <RG> --slot staging
@@ -1404,6 +1409,139 @@ az webapp log download --resource-group <RG_NAME> --name <API_APP_NAME> \
 | 6 | Enable application logging | `az webapp log config -g <RG> -n <APP> --application-logging filesystem --level information` |
 | 7 | Download logs | `az webapp log download -g <RG> -n <APP> --log-file ./logs.zip` |
 | 8 | Restart the app | `az webapp restart -g <RG> -n <APP>` |
+
+---
+
+## Appendix B: Common Frontend (SPA) Deployment Issues & Troubleshooting
+
+
+### Issue 5: Zip Deploy Returns 400 Bad Request (`SCM_DO_BUILD_DURING_DEPLOYMENT`)
+
+**Symptom:** Running `az webapp deploy --type zip` for the frontend returns a **400 Bad Request**. The Kudu deployment log may show errors about missing `package.json` or failed `npm install`.
+
+**Root Cause:** The frontend App Service has the app setting `SCM_DO_BUILD_DURING_DEPLOYMENT=true` (set by Terraform/Bicep). This tells Kudu to run a build (e.g., `npm install && npm run build`) during deployment. Since you’re deploying **pre-built static files** (the `dist/` output from Vite), there’s no `package.json` or `node_modules` in the zip, and the build step fails.
+
+**Fix - Disable remote build before deploying pre-built artifacts:**
+
+```powershell
+# Disable remote build
+az webapp config appsettings set \
+  --resource-group <RG_NAME> --name <SPA_APP_NAME> \
+  --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false
+
+# Now deploy
+az webapp deploy --resource-group <RG_NAME> --name <SPA_APP_NAME> \
+  --src-path ./dist.zip --type zip
+```
+
+> 💡 **Tip:** If you want Kudu to build from source instead, deploy the entire project directory (including `package.json`) and keep `SCM_DO_BUILD_DURING_DEPLOYMENT=true`.
+
+---
+
+### Issue 6: Frontend Returns Empty Page or Application Error
+
+**Symptom:** After successful zip deployment, navigating to `https://<SPA_APP_NAME>.azurewebsites.net` shows the Azure default page, an empty page, or "Application Error".
+
+**Root Cause:** The Node.js App Service doesn’t know how to serve static files. By default it looks for a `server.js` or `index.js` entry point. Since the Vite build output is just static HTML/CSS/JS, you need to configure a static file server.
+
+**Fix - Set the startup command to use pm2 serve:**
+
+```powershell
+# Configure pm2 to serve the static SPA with client-side routing support
+az webapp config set \
+  --resource-group <RG_NAME> --name <SPA_APP_NAME> \
+  --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"
+
+# Restart
+az webapp restart --resource-group <RG_NAME> --name <SPA_APP_NAME>
+```
+
+> ⚠️ **Important:** The `--spa` flag tells pm2 to redirect all routes to `index.html`, which is required for React Router to work correctly. Without it, refreshing on any non-root route (e.g., `/vote`) will return a 404.
+
+---
+
+### Issue 7: CORS — Frontend Cannot Call the API
+
+**Symptom:** The SPA loads correctly, but API calls fail with CORS errors in the browser console:
+
+```
+Access to fetch at 'https://<API_APP_NAME>.azurewebsites.net/api/...' 
+from origin 'https://<SPA_APP_NAME>.azurewebsites.net' has been blocked by CORS policy
+```
+
+**Root Cause:** The API doesn’t recognize the frontend’s Azure URL as an allowed origin. CORS must be configured in **two places**:
+
+1. **Azure-level CORS** (App Service platform) — the first layer the request hits
+2. **.NET application CORS** (via `AllowedOrigins` config) — the middleware inside the API
+
+**Fix - Configure both layers:**
+
+```powershell
+# 1. Azure-level CORS on the API App Service
+az webapp cors add \
+  --resource-group <RG_NAME> --name <API_APP_NAME> \
+  --allowed-origins "https://<SPA_APP_NAME>.azurewebsites.net"
+
+# 2. .NET application CORS via App Settings
+#    The API reads AllowedOrigins from config (array indexed by __0, __1, etc.)
+az webapp config appsettings set \
+  --resource-group <RG_NAME> --name <API_APP_NAME> \
+  --settings \
+    AllowedOrigins__0="https://<SPA_APP_NAME>.azurewebsites.net" \
+    AllowedOrigins__1="http://localhost:5173" \
+    AllowedOrigins__2="http://localhost:3000"
+
+# 3. Restart the API to pick up the new settings
+az webapp restart --resource-group <RG_NAME> --name <API_APP_NAME>
+```
+
+**Verify CORS is working:**
+
+```powershell
+curl -s -o /dev/null -w "%{http_code}" \
+  -H "Origin: https://<SPA_APP_NAME>.azurewebsites.net" \
+  "https://<API_APP_NAME>.azurewebsites.net/api/groups"
+```
+
+> 💡 **How the API CORS config works:** `Program.cs` reads an `AllowedOrigins` string array from configuration (see lines 42–54). In `appsettings.json` this defaults to localhost URLs for local development. In Azure, App Settings with the `AllowedOrigins__N` naming convention override the array elements. This means **no code changes are needed** — just set the App Settings.
+
+---
+
+### Issue 8: `VITE_API_URL` Must Be Set at Build Time, Not Runtime
+
+**Symptom:** The deployed SPA makes API calls to `/api` (relative URL) instead of the full API URL `https://<API_APP_NAME>.azurewebsites.net/api`, resulting in 404 errors.
+
+**Root Cause:** Vite replaces `import.meta.env.VITE_API_URL` at **build time**, not at runtime. If you run `npm run build` without setting the environment variable, it falls back to `/api` (the default in `api.ts`). Since the SPA and API are on different domains, relative URLs won’t work.
+
+**Fix - Set the environment variable before building:**
+
+```powershell
+# PowerShell
+$env:VITE_API_URL = "https://<API_APP_NAME>.azurewebsites.net/api"
+npm run build
+```
+
+```bash
+# Bash / Linux
+VITE_API_URL=https://<API_APP_NAME>.azurewebsites.net/api npm run build
+```
+
+> ⚠️ **Important:** You must rebuild the SPA every time the API URL changes. The URL is baked into the JavaScript bundle at build time.
+
+---
+
+### Quick Reference: Frontend Deployment Troubleshooting Checklist
+
+| # | Check | Command |
+|---|-------|---------|
+| 1 | Disable remote build for pre-built artifacts | `az webapp config appsettings set -g <RG> -n <SPA> --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false` |
+| 2 | Set pm2 serve startup command | `az webapp config set -g <RG> -n <SPA> --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"` |
+| 3 | Build SPA with correct API URL | `$env:VITE_API_URL="https://<API>.azurewebsites.net/api"; npm run build` |
+| 4 | Add Azure CORS on API | `az webapp cors add -g <RG> -n <API> --allowed-origins "https://<SPA>.azurewebsites.net"` |
+| 5 | Set .NET AllowedOrigins on API | `az webapp config appsettings set -g <RG> -n <API> --settings AllowedOrigins__0="https://<SPA>.azurewebsites.net"` |
+| 6 | Verify SPA serves HTML | `curl -s -o /dev/null -w "%{http_code}" https://<SPA>.azurewebsites.net` |
+| 7 | Verify CORS headers | `curl -sI -H "Origin: https://<SPA>.azurewebsites.net" https://<API>.azurewebsites.net/api/groups` |
+| 8 | Restart both apps | `az webapp restart -g <RG> -n <API>; az webapp restart -g <RG> -n <SPA>` |
 
 ---
 
