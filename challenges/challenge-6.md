@@ -246,7 +246,7 @@ resource "azurerm_linux_web_app_slot" "staging" {
 
 ### Terraform Hints for Private Networking
 
-Ask GitHub Copilot to help you understand these resources, which are already wired into the `private-networking`, `sql-database`, and `app-service` modules in this repo:
+Ask GitHub Copilot to help you understand these resources:
 
 ```hcl
 # 1. Virtual Network and subnets (modules/private-networking/main.tf)
