@@ -49,6 +49,7 @@ module "app_service" {
   key_vault_uri         = module.key_vault.key_vault_uri
   env                   = var.env
   frontend_url          = "https://app-lunchvote-spa-${var.env}-${random_string.common_suffix.result}.azurewebsites.net"
+  suffix                = random_string.common_suffix.result
 }
 
 # Frontend App Service Module
@@ -59,6 +60,7 @@ module "frontend_app_service" {
   app_service_plan_name = "plan-${var.name}-frontend-${var.env}"
   api_base_url          = "https://app-lunchvote-api-${var.env}-${random_string.common_suffix.result}.azurewebsites.net"
   environment           = var.env
+  suffix                = random_string.common_suffix.result
 }
 
 # Key Vault Access Module
