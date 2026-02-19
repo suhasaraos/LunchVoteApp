@@ -46,6 +46,7 @@ One of the most powerful (and underused) Copilot features is **Prompt Files** (`
 **Example — `build-api.prompt.md`:**
 ```markdown
 ---
+name: build-api
 description: Build and run the backend API
 ---
 
