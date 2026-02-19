@@ -34,37 +34,27 @@ GitHub Copilot in VS Code offers three built-in **agents** - each optimized for 
 
 > 💡 **Pro Tip:** Start with **Plan** to think through your approach, then hand off to **Agent** to implement it. This mirrors real-world software engineering: *design first, code second*.
 
-### Specification-Driven Development with Prompt Files
+### Reusable Prompt Files
 
-One of the most powerful (and underused) Copilot features is **Prompt Files** (`.prompt.md`) - reusable, shareable specification files that encode *what* you want built:
+One of the most powerful (and underused) Copilot features is **Prompt Files** (`.prompt.md`) — reusable, shareable prompt templates stored in your repository:
 
 - **What:** Markdown files with a `.prompt.md` extension stored in `.github/prompts/`
-- **Why:** Instead of typing the same long prompt repeatedly, you encode your specification once and invoke it with `/prompt-name` in chat
-- **How:** They support YAML frontmatter for configuring which agent, model, and tools to use, plus Markdown body with detailed instructions
-- **Bonus:** You can reference workspace files, use variables like `${selection}` and `${input:componentName}`, and share them with your team via Git
+- **Why:** Instead of typing the same long prompt repeatedly, encode it once and invoke it by name in chat
+- **How:** They use a YAML frontmatter with a `description` field, followed by a Markdown body containing the prompt instructions
+- **Bonus:** You can reference workspace files, use variables like `${selection}`, and share them with your team via Git
 
-**Example - A React Component Spec:**
+**Example — `build-api.prompt.md`:**
 ```markdown
 ---
-description: Generate a React component from specification
-agent: agent
-tools: ['editFiles', 'runInTerminal', 'codebase']
+description: Build and run the backend API
 ---
 
-Create a React functional component with TypeScript.
-
-Requirements:
-- Use React hooks (useState, useEffect) as needed
-- Include proper TypeScript interfaces for all props
-- Add JSDoc comments for the component and its props
-- Include error handling for any API calls
-- Follow the existing project patterns in [src/](../../src/lunch-vote-spa/src/)
-
-Component name: ${input:componentName}
-Component purpose: ${input:description}
+Restore NuGet dependencies, compile, and run the .NET backend API
+located in src/LunchVoteApi/.
+Report any build errors with suggested fixes.
 ```
 
-You invoke it in chat by typing: `/react-component` - and Copilot builds it to your exact spec!
+You invoke it in chat by typing its name — and Copilot executes the prompt for you!
 
 ### Custom Instructions (`.github/copilot-instructions.md`)
 
@@ -107,33 +97,6 @@ This workspace ships with **two Terraform instruction files** in `.github/instru
 | `module_generation_azure.instructions.md` | Step-by-step workflow for generating Core, Pattern, and Configuration Terraform modules |
 
 > 💡 **How it works:** Files with the `.instructions.md` extension in `.github/instructions/` are automatically loaded by GitHub Copilot based on their `applyTo` glob pattern. Because these files use `applyTo: '**'`, they apply to all files in the workspace. You don't need to invoke them — Copilot picks them up automatically.
-
-### Key Copilot Interactions at a Glance
-
-| Feature | How to Access | Purpose |
-|---------|---------------|----------|
-| **Inline Suggestions** | Just start typing | Auto-complete code as you type |
-| **Inline Chat** | `Ctrl+I` in editor | Quick edits without leaving your code |
-| **Chat View** | `Ctrl+Alt+I` | Full conversations with context |
-| **Quick Chat** | `Ctrl+Shift+Alt+L` | Fast question without switching views |
-| **`#` Context** | Type `#` in chat | Attach files, folders, tools, codebase |
-| **`@` Participants** | Type `@` in chat | `@workspace`, `@terminal`, `@vscode` |
-| **`/` Commands** | Type `/` in chat | `/fix`, `/tests`, `/explain`, `/doc`, `/plan` |
-| **Prompt Files** | `/prompt-name` | Run reusable specs |
-| **Custom Agents** | Agent dropdown | Switch to specialized personas |
-| **Vision** | Drag image into chat | Describe UI from screenshots/mockups |
-| **Code Review** | Source Control view | AI-powered review of uncommitted changes |
-
-### Copilot Features by Challenge
-
-| Challenge | Primary Copilot Feature Introduced |
-|-----------|--------------------------------------|
-| 1 - The Architect's Blueprint | **Agent mode** + **Custom Agents** for Terraform |
-| 2 - The Frontend Forge *(Optional)* | **Prompt Files** + **Plan Agent** + **Vision** |
-| 3 - Liftoff! Deploy to the Cloud | **`@terminal`** participant + **Inline Chat** in terminal |
-| 4 - The Data Fortress | **Custom Instructions** + **`#codebase`** context |
-| 5 - The Vault of Secrets | **Ask Agent** for learning + **`/explain`** command |
-| 6 - Ship It Like a Pro | **Code Review** + **Commit Message Generation** |
 
 ---
 
@@ -321,16 +284,17 @@ Before the final demo at 16:00, ensure you can demonstrate:
 
 | # | Item | Status |
 |---|------|--------|
-| 1 | Terraform code authored with GitHub Copilot  `terraform validate` passes | ⬜ |
-| 2 | React SPA built with GitHub Copilot  renders all 4 screens | ⬜ |
-| 3 | Infrastructure provisioned in Azure  all resources visible in Portal | ⬜ |
-| 4 | Backend API deployed and Swagger UI accessible | ⬜ |
+| 1 | Terraform code authored with GitHub Copilot | ⬜ |
+| 2 | React SPA built with GitHub Copilot — renders all 4 screens | ⬜ |
+| 3 | Infrastructure provisioned in Azure — all resources visible in Portal | ⬜ |
+| 4 | Backend API deployed and responding to requests | ⬜ |
 | 5 | Frontend SPA deployed and accessible | ⬜ |
 | 6 | Key Vault configured with Managed Identity access | ⬜ |
 | 7 | SQL Database connected with Managed Identity (no passwords!) | ⬜ |
 | 8 | Data persists across App Service restarts | ⬜ |
 | 9 | Blue/Green deployment with staging slot swap demonstrated | ⬜ |
-| 10 | Live log streaming shown | ⬜ |
+| 10 | SQL Database protected behind a private endpoint (Challenge 6) | ⬜ |
+| 11 | Live log streaming shown | ⬜ |
 
 > 💡 **What's next?** Challenge 6 includes a **"Beyond the Hackathon"** section with Azure best practices for production readiness — covering Application Insights, Defender for Cloud, autoscaling, CI/CD with GitHub Actions, and more. Review it after the hackathon to understand what it takes to run enterprise-grade applications on Azure.
 
@@ -338,14 +302,7 @@ Before the final demo at 16:00, ensure you can demonstrate:
 
 ## 🧹 Cleanup
 
-After the hackathon, destroy your Azure resources to avoid ongoing charges:
-
-```powershell
-cd infra/my-terraform
-terraform destroy -var="sql_admin_object_id=$OBJECT_ID" -var="sql_admin_login=$EMAIL"
-```
-
-Or delete the resource group directly:
+After the hackathon, delete your Azure resource group to remove all resources and avoid ongoing charges:
 
 ```powershell
 az group delete --name rg-lunchvote-dev --yes --no-wait
