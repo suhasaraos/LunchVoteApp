@@ -3,20 +3,14 @@
 # Uses the shared App Service Plan created by the API module
 
 
-
-<<<<<<< HEAD
-resource "azurerm_service_plan" "frontend" {
-  name                = "${var.app_service_plan_name}-${var.suffix}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  os_type             = "Linux"
-  sku_name            = "B1"
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
 }
 
-=======
->>>>>>> e4d65c213315add9b6e5c8b240c367e6e6299846
 resource "azurerm_linux_web_app" "frontend" {
-  name                = "app-lunchvote-spa-${var.environment}-${var.suffix}"
+  name                = "app-lunchvote-spa-${var.environment}-${random_string.suffix.result}"
   location            = var.location
   resource_group_name = var.resource_group_name
   service_plan_id     = var.service_plan_id
