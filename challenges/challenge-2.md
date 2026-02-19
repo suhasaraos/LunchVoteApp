@@ -10,6 +10,14 @@
 
 > 💡 **This challenge is optional.** If you'd prefer to focus on infrastructure and deployment, you can skip building the frontend from scratch and use the **pre-built SPA** provided in `src/lunch-vote-spa/`. Simply run `npm install && npm run dev` to start it locally. If you do choose this challenge, follow the prompts below to build the full app with GitHub Copilot.
 
+### ⚠️ Before You Begin — Workspace Preparation
+
+This repository contains a **complete React + TypeScript SPA** in `src/lunch-vote-spa/`. If this folder remains in your workspace, GitHub Copilot will use it as context and may simply reproduce the existing components, styles, and service code rather than helping you build your own.
+
+**If you are attempting this challenge, delete or move the existing SPA folder outside the workspace before starting:**
+
+---
+
 ### Synopsis
 
 The backend API is ready and waiting. Now it's time to give it a face. In this challenge, you'll build a **React + TypeScript** single-page application (SPA) from scratch using **Vite** as your build tool and **GitHub Copilot** as your AI pair-programmer. Your SPA will let users browse teams, create polls, cast votes, and view live results.

@@ -68,6 +68,20 @@ When a command fails:
 
 > 💡 **Pro Tip:** After a failed command, you can click the sparkle icon ✨ next to the terminal error to have Copilot suggest a fix automatically.
 
+#### 🔧 Azure Copilot — Your Cloud Debugging Companion in the Azure Portal
+
+**[Azure Copilot](https://learn.microsoft.com/en-us/azure/copilot/overview)** is an AI assistant built into the **Azure Portal** that helps you design, operate, optimise, and troubleshoot your Azure resources using natural language. It's available at no additional cost — just click the **Copilot icon** in the portal header to open it. From this challenge onward, it's an invaluable companion alongside GitHub Copilot in VS Code.
+
+**Key capabilities relevant to this hackathon:**
+
+- **Troubleshoot App Service deployments** — *"Why did my App Service deployment fail?"* or *"What's the issue with my app?"* — Azure Copilot analyses diagnostics and suggests fixes ([learn more](https://learn.microsoft.com/en-us/azure/copilot/troubleshoot-app-service))
+- **Query resource information** — *"Show me resources in rg-lunchvote-dev"* — uses Azure Resource Graph queries to surface resource status, health, and configuration ([learn more](https://learn.microsoft.com/en-us/azure/copilot/get-information-resource-graph))
+- **Monitor and debug** — *"Show me monitoring metrics for my App Service"* — view request counts, response times, and error rates without navigating between blades ([learn more](https://learn.microsoft.com/en-us/azure/copilot/get-monitoring-information))
+- **Generate CLI and Terraform scripts** — *"Generate an Azure CLI command to update CORS on my App Service"* — Azure Copilot can author runnable scripts for common operations ([learn more](https://learn.microsoft.com/en-us/azure/copilot/generate-cli-scripts))
+- **Get Advisor recommendations** — *"Show me cost optimisation recommendations"* — surfaces Well-Architected Framework guidance tailored to your deployed resources
+
+> 💡 **Tip:** You can add context to your Azure Copilot conversation by selecting specific resources, subscriptions, or resource groups — this helps it give more targeted answers. Try it after running `terraform apply` by asking: *"Troubleshoot my App Service"* and selecting the deployed App Service resource.
+
 ### Acceptance Criteria
 
 | # | Criteria | Details |

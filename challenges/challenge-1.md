@@ -8,6 +8,15 @@
 
 ---
 
+### ⚠️ Before You Begin — Workspace Preparation
+
+This repository contains a **complete Terraform configuration** in `infra/terraform/` that was used to provision the reference environment. If this folder remains in your workspace, GitHub Copilot will use it as context and may simply reproduce the existing code rather than helping you learn to write your own.
+
+**To ensure a genuine learning experience, delete or move this folder outside the workspace before starting:**
+
+
+---
+
 ### Synopsis
 
 Before a single line of application code runs in the cloud, someone needs to build the cloud itself. In this challenge, you will become that someone. Using **Terraform** and **GitHub Copilot**, you'll define the complete Azure infrastructure for the Lunch Vote App as code  a practice known as **Infrastructure as Code (IaC)**.
