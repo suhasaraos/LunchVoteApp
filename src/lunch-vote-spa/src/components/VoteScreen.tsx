@@ -104,10 +104,6 @@ export function VoteScreen() {
     }
   };
 
-<<<<<<< HEAD
-
-=======
->>>>>>> e4d65c213315add9b6e5c8b240c367e6e6299846
   if (isLoading) {
     return (
       <div className="vote-screen">

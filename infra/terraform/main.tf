@@ -1,11 +1,10 @@
+# Main orchestration for Lunch Vote App infrastructure
+# Deploys App Service, SQL Database, Key Vault, and Static Web App
 resource "random_string" "common_suffix" {
   length  = 6
   special = false
   upper   = false
 }
-
-# Main orchestration for Lunch Vote App infrastructure
-# Deploys App Service, SQL Database, Key Vault, and Static Web App
 
 # Data source for current Azure configuration
 data "azurerm_client_config" "current" {}
@@ -57,7 +56,7 @@ module "frontend_app_service" {
   source = "./modules/frontend-app-service"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  app_service_plan_name = "plan-${var.name}-${var.env}"
+  service_plan_id     = module.app_service.service_plan_id
   api_base_url        = "https://${module.app_service.default_hostname}"
   environment         = var.env
 }

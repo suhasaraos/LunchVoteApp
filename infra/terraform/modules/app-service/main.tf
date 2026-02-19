@@ -22,6 +22,7 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   site_config {
+    always_on           = false
     ftps_state          = "Disabled"
     http2_enabled       = true
     minimum_tls_version = "1.2"
@@ -52,5 +53,3 @@ resource "azurerm_linux_web_app" "main" {
     value = "Server=tcp:${var.sql_server_fqdn},1433;Database=${var.sql_database_name};Authentication=Active Directory Default;"
   }
 }
-
-

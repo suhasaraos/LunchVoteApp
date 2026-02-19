@@ -21,6 +21,7 @@ resource "azurerm_linux_web_app" "frontend" {
   }
 
   site_config {
+    always_on           = false
     ftps_state          = "Disabled"
     minimum_tls_version = "1.2"
     http2_enabled       = true
@@ -41,4 +42,3 @@ resource "azurerm_linux_web_app" "frontend" {
     "PRE_BUILD_COMMAND" = "npm install -g pm2 serve"
   }
 }
-
