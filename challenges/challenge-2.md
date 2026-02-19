@@ -58,8 +58,8 @@ mkdir -p .github/prompts
 **2. Scaffold the project** — `.github/prompts/scaffold-react-app.prompt.md`:
 ```markdown
 ---
+name: scaffold-react-app
 description: Scaffold a React + TypeScript SPA with Vite
-agent: agent
 ---
 
 Scaffold a new React + TypeScript project using Vite in `src/lunch-vote-spa/`.
@@ -106,8 +106,8 @@ src/lunch-vote-spa/
 **3. Generate the API service layer** — `.github/prompts/generate-api-layer.prompt.md`:
 ```markdown
 ---
+name: generate-api-layer
 description: Generate TypeScript types, API service, and voter token for Lunch Vote App
-agent: agent
 ---
 
 Generate the complete API integration layer for the Lunch Vote SPA.
@@ -152,8 +152,8 @@ Requirements:
 **4. Build the Home screen** — `.github/prompts/build-home-screen.prompt.md`:
 ```markdown
 ---
+name: build-home-screen
 description: Build the Home screen component for the Lunch Vote App
-agent: agent
 ---
 
 Create `src/lunch-vote-spa/src/components/Home.tsx` and `Home.css`.
@@ -185,8 +185,8 @@ Create `src/lunch-vote-spa/src/components/Home.tsx` and `Home.css`.
 **5. Build the voting and poll creation screens** — `.github/prompts/build-voting-screens.prompt.md`:
 ```markdown
 ---
+name: build-voting-screens
 description: Build the Vote and Create Poll screens with shared UI components
-agent: agent
 ---
 
 Create the following components in `src/lunch-vote-spa/src/components/`, each with a matching `.css` file.
@@ -261,8 +261,8 @@ Route: `/group/:groupId/create` — uses `useParams` to get `groupId`.
 **6. Build the Results screen** — `.github/prompts/build-results-screen.prompt.md`:
 ```markdown
 ---
+name: build-results-screen
 description: Build the Results screen with auto-refresh and animated result bars
-agent: agent
 ---
 
 Create the following components in `src/lunch-vote-spa/src/components/`, each with a matching `.css` file.
