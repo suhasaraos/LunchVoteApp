@@ -18,32 +18,32 @@ Today, you'll go from a blank canvas to a fully operational, cloud-native applic
 
 ---
 
-## GitHub Copilot Deep Dive — Your AI Toolkit
+## GitHub Copilot Deep Dive - Your AI Toolkit
 
 Before we begin, let's understand the **GitHub Copilot features** you'll be mastering today. Each challenge deliberately introduces a different Copilot capability so that by the end of the day, you'll be a Copilot power user.
 
 ### Built-in Agents (Chat Personas)
 
-GitHub Copilot in VS Code offers three built-in **agents** — each optimized for different workflows. You select an agent from the dropdown at the top of the Chat view:
+GitHub Copilot in VS Code offers three built-in **agents** - each optimized for different workflows. You select an agent from the dropdown at the top of the Chat view:
 
 | Agent | Shortcut | What It Does | When to Use It |
 |-------|----------|--------------|----------------|
 | **Agent** | `Ctrl+Shift+I` | Autonomously plans, edits files, runs terminal commands, and invokes tools across your workspace | Building features, fixing bugs, scaffolding projects |
 | **Plan** | `/plan` | Creates a structured, step-by-step implementation plan *without* writing code. Hands off to Agent when approved | Complex tasks, architecture decisions, before major changes |
-| **Ask** | `Ctrl+Alt+I` | Answers questions about coding concepts, your codebase, or VS Code itself. Read-only — never modifies files | Learning, exploration, understanding unfamiliar code |
+| **Ask** | `Ctrl+Alt+I` | Answers questions about coding concepts, your codebase, or VS Code itself. Read-only - never modifies files | Learning, exploration, understanding unfamiliar code |
 
 > 💡 **Pro Tip:** Start with **Plan** to think through your approach, then hand off to **Agent** to implement it. This mirrors real-world software engineering: *design first, code second*.
 
 ### Specification-Driven Development with Prompt Files
 
-One of the most powerful (and underused) Copilot features is **Prompt Files** (`.prompt.md`) — reusable, shareable specification files that encode *what* you want built. Think of them as a **spec kit** for AI-assisted development:
+One of the most powerful (and underused) Copilot features is **Prompt Files** (`.prompt.md`) - reusable, shareable specification files that encode *what* you want built. Think of them as a **spec kit** for AI-assisted development:
 
 - **What:** Markdown files with a `.prompt.md` extension stored in `.github/prompts/`
 - **Why:** Instead of typing the same long prompt repeatedly, you encode your specification once and invoke it with `/prompt-name` in chat
 - **How:** They support YAML frontmatter for configuring which agent, model, and tools to use, plus Markdown body with detailed instructions
 - **Bonus:** You can reference workspace files, use variables like `${selection}` and `${input:componentName}`, and share them with your team via Git
 
-**Example — A React Component Spec:**
+**Example - A React Component Spec:**
 ```markdown
 ---
 description: Generate a React component from specification
@@ -64,11 +64,11 @@ Component name: ${input:componentName}
 Component purpose: ${input:description}
 ```
 
-You invoke it in chat by typing: `/react-component` — and Copilot builds it to your exact spec!
+You invoke it in chat by typing: `/react-component` - and Copilot builds it to your exact spec!
 
 ### Custom Instructions (`.github/copilot-instructions.md`)
 
-Custom Instructions are **always-on** rules that shape how Copilot responds — across all chat interactions in your workspace. Unlike prompt files (which you invoke explicitly), custom instructions are automatically applied.
+Custom Instructions are **always-on** rules that shape how Copilot responds - across all chat interactions in your workspace. Unlike prompt files (which you invoke explicitly), custom instructions are automatically applied.
 
 Use them to encode your team's coding standards:
 ```markdown
@@ -117,12 +117,12 @@ Switch to your custom agent from the agent dropdown anytime!
 
 | Challenge | Primary Copilot Feature Introduced |
 |-----------|--------------------------------------|
-| 1 — The Architect's Blueprint | **Agent mode** + **Custom Agents** for Terraform |
-| 2 — The Frontend Forge | **Prompt Files (Spec Kit)** + **Plan Agent** + **Vision** |
-| 3 — Liftoff! Deploy to the Cloud | **`@terminal`** participant + **Inline Chat** in terminal |
-| 4 — The Vault of Secrets | **Ask Agent** for learning + **`/explain`** command |
-| 5 — The Data Fortress | **Custom Instructions** + **`#codebase`** context |
-| 6 — Ship It Like a Pro | **Code Review** + **Commit Message Generation** |
+| 1 - The Architect's Blueprint | **Agent mode** + **Custom Agents** for Terraform |
+| 2 - The Frontend Forge | **Prompt Files (Spec Kit)** + **Plan Agent** + **Vision** |
+| 3 - Liftoff! Deploy to the Cloud | **`@terminal`** participant + **Inline Chat** in terminal |
+| 4 - The Vault of Secrets | **Ask Agent** for learning + **`/explain`** command |
+| 5 - The Data Fortress | **Custom Instructions** + **`#codebase`** context |
+| 6 - Ship It Like a Pro | **Code Review** + **Commit Message Generation** |
 
 ---
 
@@ -385,7 +385,7 @@ infra/
 
 ### 🤖 GitHub Copilot Skill Focus: Agent Mode + Custom Agents
 
-This challenge introduces **Agent mode** and **Custom Agents** — the most powerful way to use Copilot for code generation.
+This challenge introduces **Agent mode** and **Custom Agents** - the most powerful way to use Copilot for code generation.
 
 #### Step-by-Step: Create a Terraform Custom Agent
 
@@ -422,7 +422,7 @@ You are an expert Terraform engineer specializing in Azure cloud infrastructure.
 
 - **Agent mode (`Ctrl+Shift+I`)**: Let Copilot create files, run `terraform validate`, and fix issues autonomously
 - **Ask mode**: Switch to **Ask** agent to learn: *"Explain the difference between azurerm_role_assignment and azurerm_key_vault_access_policy"*
-- **Inline suggestions**: Open a `.tf` file and start typing `resource "azurerm_` — watch Copilot auto-complete the resource block
+- **Inline suggestions**: Open a `.tf` file and start typing `resource "azurerm_` - watch Copilot auto-complete the resource block
 - **`@terminal`**: In chat, ask `@terminal how do I initialize Terraform in my infra directory?`
 - **`/explain`**: Select a Terraform block and use `/explain` to understand what it does
 
@@ -470,7 +470,7 @@ Using GitHub Copilot, create a React + TypeScript SPA that integrates with the p
 
 ### 🤖 GitHub Copilot Skill Focus: Specification-Driven Development with Prompt Files (Spec Kit)
 
-This challenge introduces **Prompt Files** — your personal **spec kit** for driving Copilot with reusable, structured specifications. Instead of typing ad-hoc prompts, you'll write specifications that encode exactly what you want built.
+This challenge introduces **Prompt Files** - your personal **spec kit** for driving Copilot with reusable, structured specifications. Instead of typing ad-hoc prompts, you'll write specifications that encode exactly what you want built.
 
 #### Step-by-Step: Build Your Spec Kit
 
@@ -479,7 +479,7 @@ This challenge introduces **Prompt Files** — your personal **spec kit** for dr
 mkdir -p .github/prompts
 ```
 
-**2. Create a project scaffold spec** — `.github/prompts/scaffold-react-app.prompt.md`:
+**2. Create a project scaffold spec** - `.github/prompts/scaffold-react-app.prompt.md`:
 ```markdown
 ---
 description: Scaffold a React + TypeScript SPA with Vite
@@ -512,7 +512,7 @@ src/lunch-vote-spa/
 ```
 ```
 
-**3. Create a component generation spec** — `.github/prompts/react-component.prompt.md`:
+**3. Create a component generation spec** - `.github/prompts/react-component.prompt.md`:
 ```markdown
 ---
 description: Generate a React component from specification
@@ -535,7 +535,7 @@ Create a React functional component with TypeScript for the Lunch Vote App.
 - Follow existing patterns from the project's components/ directory
 ```
 
-**4. Create an API service spec** — `.github/prompts/api-service.prompt.md`:
+**4. Create an API service spec** - `.github/prompts/api-service.prompt.md`:
 ```markdown
 ---
 description: Generate the API service layer for Lunch Vote App
@@ -647,9 +647,9 @@ Provision your Terraform infrastructure to Azure and deploy both the API and SPA
 
 ### 🤖 GitHub Copilot Skill Focus: `@terminal` Participant + Inline Terminal Chat
 
-This challenge is all about command-line work — and Copilot shines here too!
+This challenge is all about command-line work - and Copilot shines here too!
 
-#### `@terminal` — Your Command-Line Guide
+#### `@terminal` - Your Command-Line Guide
 
 Instead of Googling Azure CLI syntax, ask Copilot directly in chat:
 - `@terminal How do I deploy a zip file to Azure App Service?`
@@ -658,7 +658,7 @@ Instead of Googling Azure CLI syntax, ask Copilot directly in chat:
 
 #### Inline Chat in the Terminal
 
-Press `Ctrl+I` while your cursor is in the **integrated terminal** to open Inline Chat. Describe what you want in natural language — Copilot generates the command:
+Press `Ctrl+I` while your cursor is in the **integrated terminal** to open Inline Chat. Describe what you want in natural language - Copilot generates the command:
 - *"Publish my .NET app to a folder called publish"*  → `dotnet publish -c Release -o ./publish`
 - *"Zip all files in the publish folder"* → `Compress-Archive -Path ./publish/* -DestinationPath ./publish.zip -Force`
 - *"Show me the terraform outputs"* → `terraform output`
@@ -799,16 +799,16 @@ Configure your deployed Azure infrastructure so the backend App Service can secu
 
 ### 🤖 GitHub Copilot Skill Focus: Ask Agent + `/explain` for Deep Learning
 
-Security concepts like Managed Identity, RBAC, and Key Vault can be complex. This challenge is designed for **learning** — and the **Ask** agent is your teacher.
+Security concepts like Managed Identity, RBAC, and Key Vault can be complex. This challenge is designed for **learning** - and the **Ask** agent is your teacher.
 
 #### Using Ask Agent to Learn
 
-Switch to the **Ask** agent from the dropdown (it never modifies files — safe for exploration):
+Switch to the **Ask** agent from the dropdown (it never modifies files - safe for exploration):
 
 - *"Explain how Azure Managed Identity works at a technical level. How does the token exchange happen?"*
 - *"What's the difference between System-Assigned and User-Assigned Managed Identity?"*
 - *"Why is RBAC preferred over Key Vault access policies?"*
-- *"What happens when my App Service tries to access Key Vault — walk me through the authentication flow"*
+- *"What happens when my App Service tries to access Key Vault - walk me through the authentication flow"*
 
 #### `/explain` on Terraform Code
 
@@ -819,7 +819,7 @@ Select your Key Vault Terraform module and use `/explain` to understand each pro
 
 #### Multi-Model Exploration
 
-Try asking the same question to **different AI models** using the model picker (click the model name at the bottom of chat). Compare how Claude, GPT, and other models explain Managed Identity differently — you'll get richer understanding from multiple perspectives!
+Try asking the same question to **different AI models** using the model picker (click the model name at the bottom of chat). Compare how Claude, GPT, and other models explain Managed Identity differently - you'll get richer understanding from multiple perspectives!
 
 ### Acceptance Criteria
 
@@ -908,7 +908,7 @@ Wire up your deployed backend API to the Azure SQL Database provisioned by Terra
 
 ### 🤖 GitHub Copilot Skill Focus: Custom Instructions + `#codebase` Context
 
-This challenge introduces **Custom Instructions** — always-on rules that shape every Copilot response in your workspace.
+This challenge introduces **Custom Instructions** - always-on rules that shape every Copilot response in your workspace.
 
 #### Step-by-Step: Create Custom Instructions
 
@@ -917,7 +917,7 @@ This challenge introduces **Custom Instructions** — always-on rules that shape
 
 ```markdown
 ## Project Context
-This is the Lunch Vote App — a team-based lunch voting application.
+This is the Lunch Vote App - a team-based lunch voting application.
 - Backend: .NET 10 Web API with Entity Framework Core
 - Frontend: React + TypeScript SPA with Vite
 - Database: Azure SQL Database with Entra ID authentication
@@ -1019,7 +1019,7 @@ Upgrade your App Service to support deployment slots, implement a blue/green dep
 
 ### 🤖 GitHub Copilot Skill Focus: Code Review + Commit Message Generation
 
-For the final challenge, you'll use Copilot as a **code reviewer** and **DevOps assistant** — the capstone of your Copilot journey.
+For the final challenge, you'll use Copilot as a **code reviewer** and **DevOps assistant** - the capstone of your Copilot journey.
 
 #### AI-Powered Code Review
 
@@ -1159,7 +1159,7 @@ az group delete --name rg-lunchvote-dev --yes --no-wait
 | **Use `@workspace`** | Ask Copilot about your codebase: *"@workspace What API endpoints does the backend expose?"* |
 | **Use `#codebase`** | *"#codebase Find all places where the connection string is configured"* |
 | **Use `@terminal`** | *"@terminal How do I check if my Terraform state is up to date?"* |
-| **Multi-turn conversations** | Ask follow-up questions — Copilot remembers the full conversation context |
+| **Multi-turn conversations** | Ask follow-up questions - Copilot remembers the full conversation context |
 
 ### Keyboard Shortcuts Cheat Sheet
 
@@ -1245,6 +1245,154 @@ az group delete --name rg-lunchvote-dev --yes --no-wait
   "message": "Human-readable description"
 }
 ```
+
+---
+
+## Appendix A: Common API Deployment Issues & Troubleshooting
+
+
+### Issue 1: .NET Runtime Version Mismatch (Terraform deploys .NET 8.0, App targets .NET 10)
+
+**Symptom:** The App Service is configured with `.NET 8.0` runtime (as set by Terraform), but the Lunch Vote API targets `.NET 10`. The app may fail to start or behave unexpectedly.
+
+**Root Cause:** The Terraform modules in `infra/terraform/` (and `infra/bicep/`) configure the App Service with `.NET 8.0 LTS` as the runtime stack. Since the API project targets `net10.0`, the deployed App Service needs to be updated to match.
+
+**Fix - Update via Azure CLI after `terraform apply`:**
+
+```powershell
+# Check current runtime
+az webapp config show --resource-group rg-lunchvote-dev --name <API_APP_NAME> --query "linuxFxVersion" -o tsv
+
+# Update to .NET 10
+az webapp config set --resource-group rg-lunchvote-dev --name <API_APP_NAME> --linux-fx-version "DOTNETCORE|10.0"
+
+# Restart the app
+az webapp restart --resource-group rg-lunchvote-dev --name <API_APP_NAME>
+```
+
+> ⚠️ **Important:** Always ensure your App Service runtime version matches your project's target framework. Check `<TargetFramework>` in your `.csproj` file.
+
+---
+
+### Issue 2: Zip Deploy Fails with `System.IO.IOException: Invalid argument` (BuildHost-netcore folder)
+
+**Symptom:** Running `az webapp deploy --type zip` returns a **500 error** with a stack trace containing:
+
+```
+System.IO.IOException: Invalid argument :
+  '/home/site/wwwroot/BuildHost-netcore\it\System.CommandLine.resources.dll'
+```
+
+**Root Cause:** The `dotnet publish` output on Windows includes a `BuildHost-netcore` folder that contains files with **Windows-style backslash paths** (e.g., `it\System.CommandLine.resources.dll`). Azure App Service runs on **Linux**, where backslashes in filenames are invalid. When Kudu tries to extract and copy these files, it fails.
+
+**Fix - Remove the folder before zipping:**
+
+```powershell
+# Publish
+dotnet publish src/LunchVoteApi/LunchVoteApi.csproj -c Release -o ./publish
+
+# Remove the problematic folder
+Remove-Item -Recurse -Force ./publish/BuildHost-netcore -ErrorAction SilentlyContinue
+
+# Zip and deploy
+Compress-Archive -Path ./publish/* -DestinationPath ./lunchvoteapi.zip -Force
+az webapp deploy --resource-group <RG_NAME> --name <API_APP_NAME> --src-path ./lunchvoteapi.zip --type zip
+```
+
+> 💡 **Tip:** Always check the publish output for any folders with backslash paths before zipping for a Linux App Service.
+
+---
+
+### Issue 3: API Returns 500 `"An unexpected error occurred."` After Successful Deployment
+
+**Symptom:** The App Service starts successfully (container logs show `Application started`), but every API call returns:
+
+```json
+{"error":"InternalError","message":"An unexpected error occurred."}
+```
+
+**Root Cause:** The Terraform/Bicep deployment configures a **SQL connection string** (`DefaultConnection`) on the App Service using `Active Directory Default` authentication. However, the App Service's **Managed Identity has not been added as a SQL user** - the `infra/scripts/create-sql-user.sql` script hasn't been executed yet. When the API tries to query the database, the connection fails and the global exception handler returns a generic 500.
+
+**Quick Fix - Use in-memory database for initial testing:**
+
+Remove the connection string so the app falls back to its built-in in-memory database with mock data:
+
+```powershell
+# Remove the SQL connection string
+az webapp config connection-string delete \
+  --resource-group <RG_NAME> \
+  --name <API_APP_NAME> \
+  --setting-names DefaultConnection
+
+# Restart the app
+az webapp restart --resource-group <RG_NAME> --name <API_APP_NAME>
+
+# Test - should now return mock data
+curl -s https://<API_APP_NAME>.azurewebsites.net/api/groups
+# Expected: ["platform","security"]
+```
+
+**Proper Fix - Create the SQL user for Managed Identity (Challenge 5):**
+
+1. Update the app service name in `infra/scripts/create-sql-user.sql` to match your actual app name (including the random suffix)
+2. Run the SQL script against `sqldb-lunchvote` while connected as the Entra admin
+3. Restore the connection string:
+
+```powershell
+az webapp config connection-string set \
+  --resource-group <RG_NAME> \
+  --name <API_APP_NAME> \
+  --settings DefaultConnection="Server=tcp:<SQL_SERVER>.database.windows.net,1433;Database=sqldb-lunchvote;Authentication=Active Directory Default;" \
+  --connection-string-type SQLAzure
+```
+
+> 💡 **Debugging Tip:** To see the actual exception, enable application logging:
+> ```powershell
+> az webapp log config --resource-group <RG_NAME> --name <API_APP_NAME> \
+>   --application-logging filesystem --level information
+> az webapp log download --resource-group <RG_NAME> --name <API_APP_NAME> \
+>   --log-file ./app-logs.zip
+> ```
+
+---
+
+### Issue 4: Application Logging Not Enabled by Default
+
+**Symptom:** You're getting errors but can't find any useful logs in the downloaded log files - the Docker container logs show the app started, but no application-level errors are captured.
+
+**Root Cause:** By default, Azure App Service has **application logging disabled** (`fileSystem.level: Off`). The container/platform logs only show startup events, not application exceptions.
+
+**Fix - Enable application logging:**
+
+```powershell
+# Enable file system logging at Information level
+az webapp log config --resource-group <RG_NAME> --name <API_APP_NAME> \
+  --application-logging filesystem --level information
+
+# Trigger the failing request
+curl -s https://<API_APP_NAME>.azurewebsites.net/api/groups
+
+# Download and inspect logs
+az webapp log download --resource-group <RG_NAME> --name <API_APP_NAME> \
+  --log-file ./app-logs.zip
+```
+
+> 💡 **Tip:** Enable logging **before** you start debugging. It's much easier to diagnose issues when you can see the actual exception stack traces.
+
+---
+
+### Quick Reference: Deployment Troubleshooting Checklist
+
+| # | Check | Command |
+|---|-------|---------|
+| 1 | Verify .NET runtime version matches your app | `az webapp config show -g <RG> -n <APP> --query linuxFxVersion -o tsv` |
+| 2 | Check if the app is running | `curl -s https://<APP>.azurewebsites.net/api/groups` |
+| 3 | View App Service app settings | `az webapp config appsettings list -g <RG> -n <APP> -o table` |
+| 4 | View connection strings | `az webapp config connection-string list -g <RG> -n <APP> -o table` |
+| 5 | Check Managed Identity | `az webapp identity show -g <RG> -n <APP> --query principalId -o tsv` |
+| 6 | Enable application logging | `az webapp log config -g <RG> -n <APP> --application-logging filesystem --level information` |
+| 7 | Download logs | `az webapp log download -g <RG> -n <APP> --log-file ./logs.zip` |
+| 8 | Restart the app | `az webapp restart -g <RG> -n <APP>` |
 
 ---
 
