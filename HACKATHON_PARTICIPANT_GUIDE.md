@@ -307,7 +307,7 @@ Each challenge is documented in its own file. Complete them in order (Challenge 
 | # | Challenge | Duration | Description |
 |---|-----------|----------|-------------|
 | 1 | [🏗️ The Architect's Blueprint](challenges/challenge-1.md) | ~60 min | Use GitHub Copilot to author Terraform IaC and provision Azure resources |
-| 2 | [🎨 The Frontend Forge *(Optional)*](challenges/challenge-2.md) | ~90 min | Build a React + TypeScript SPA with GitHub Copilot assistance |
+| 2 | [🎨 The Frontend Forge *(Optional)*](challenges/challenge-2.md) | ~60 min | Build a React + TypeScript SPA with GitHub Copilot assistance |
 | 3 | [☁️ Liftoff! Deploy to the Cloud](challenges/challenge-3.md) | ~60 min | Deploy the backend API and frontend SPA to Azure App Service |
 | 4 | [🔐 The Vault of Secrets](challenges/challenge-4.md) | ~60 min | Secure secrets with Azure Key Vault and Managed Identity |
 | 5 | [🗃️ The Data Fortress](challenges/challenge-5.md) | ~60 min | Migrate from in-memory storage to Azure SQL with EF Core |
