@@ -86,7 +86,7 @@ Define CSS custom properties on `:root` for a themed design:
 - Global reset (box-sizing: border-box), system font stack, light gray background.
 
 ## Project Structure
-```
+
 src/lunch-vote-spa/
 ├── index.html
 ├── package.json
@@ -100,7 +100,7 @@ src/lunch-vote-spa/
     ├── components/       # One file per component + matching .css
     ├── services/         # API client + voter token
     └── types/            # TypeScript interfaces (index.ts)
-```
+
 ```
 
 **3. Generate the API service layer** — `.github/prompts/generate-api-layer.prompt.md`:
@@ -322,7 +322,15 @@ After each prompt, review the generated code, then move to the next. You can ite
 #### Additional Copilot Techniques for Frontend Development
 
 - **Plan agent first**: Start with the **Plan** agent: *"Plan the component architecture for a voting SPA with 4 screens"*. Review the plan, then click **Start Implementation** to hand off to Agent mode
-- **Vision (image context)**: Have a UI mockup or wireframe? Drag the image into the Chat view and ask: *"Build this screen as a React component"*
+- **Vision (image context)**: We've provided UI mockup images in the `challenges/` folder. Drag any of these into the Copilot Chat view and ask Copilot to build the screen as a React component:
+
+  | Mockup | File | Prompt Example |
+  |--------|------|----------------|
+  | 🏠 Home Screen | ![Home Screen](homescreen.jpg) | *"Build this Home screen as a React component"* |
+  | 🗳️ Vote / Submission Screen | ![Vote Submission Screen](votesubmissionscreen.jpg) | *"Build this voting screen as a React component"* |
+  | 📝 Poll Creation Screen | ![Poll Creation Screen](pollcreationscreen.jpg) | *"Build this poll creation form as a React component"* |
+
+  Simply drag the image into Chat, or attach it with `#file:challenges/homescreen.jpg`, and ask: *"Build this screen as a React component matching this mockup"*
 - **Inline Chat (`Ctrl+I`)**: Select a component in the editor and press `Ctrl+I` to ask for modifications: *"Add loading spinner and error state to this component"*
 - **`/tests`**: Select a component or service file, then type `/tests` to auto-generate unit tests
 - **Context with `#`**: Type `#types/index.ts` in chat to reference your TypeScript interfaces when asking Copilot to build components that use them
@@ -348,7 +356,7 @@ After each prompt, review the generated code, then move to the next. You can ite
 
 - Use your **Prompt Files** to scaffold the project, generate the API service layer, and create components consistently
 - Start with the **Plan** agent to design the component architecture before implementing
-- Use **Vision** by dragging mockup/wireframe images into chat for UI generation
+- Use **Vision** by dragging the provided mockup images (`challenges/homescreen.jpg`, `challenges/votesubmissionscreen.jpg`, `challenges/pollcreationscreen.jpg`) into chat for UI generation
 - Use **Inline Chat** (`Ctrl+I`) to refine individual components after generation
 - Ask Copilot to help with CSS styling: *"Style this component with a modern card-based layout using CSS flexbox"*
 - Use `/tests` on your service layer to generate unit tests
