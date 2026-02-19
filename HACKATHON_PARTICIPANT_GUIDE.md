@@ -97,6 +97,17 @@ Always include variable validation rules.
 
 Switch to your custom agent from the agent dropdown anytime!
 
+### Pre-loaded Terraform Instruction Files (`.github/instructions/`)
+
+This workspace ships with **two Terraform instruction files** in `.github/instructions/` that GitHub Copilot will automatically follow whenever you work on Terraform code. These encode Azure Terraform coding standards and module generation workflows so that Copilot produces compliant infrastructure code out of the box — no extra prompting required.
+
+| File | Purpose |
+|------|---------|
+| `terraform_coding_standards_azure.instructions.md` | Naming conventions, file structure, variable standards, tag management, and Azure-specific best practices |
+| `module_generation_azure.instructions.md` | Step-by-step workflow for generating Core, Pattern, and Configuration Terraform modules |
+
+> 💡 **How it works:** Files with the `.instructions.md` extension in `.github/instructions/` are automatically loaded by GitHub Copilot based on their `applyTo` glob pattern. Because these files use `applyTo: '**'`, they apply to all files in the workspace. You don't need to invoke them — Copilot picks them up automatically.
+
 ### Key Copilot Interactions at a Glance
 
 | Feature | How to Access | Purpose |

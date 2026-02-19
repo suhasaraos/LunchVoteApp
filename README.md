@@ -6,6 +6,10 @@ A team-based lunch voting application that enables groups within an organization
 
 ```
 LunchVoteApp/
+├── .github/
+│   └── instructions/          # GitHub Copilot instruction files
+│       ├── module_generation_azure.instructions.md
+│       └── terraform_coding_standards_azure.instructions.md
 ├── src/
 │   ├── LunchVoteApi/          # .NET 10 Web API
 │   └── lunch-vote-spa/        # React + Vite + TypeScript SPA
@@ -16,6 +20,8 @@ LunchVoteApp/
 │   └── terraform/             # Terraform IaC templates
 └── LunchVoteApp.sln           # Visual Studio solution file
 ```
+
+> **GitHub Copilot Instructions:** The `.github/instructions/` folder contains Terraform coding standards and module generation guidelines. GitHub Copilot automatically follows these instruction files when generating or editing Terraform code in this workspace.
 
 ## Technology Stack
 
